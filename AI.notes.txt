@@ -1,0 +1,13 @@
+prompt for UI
+STEP 1
+please create an angular resposnsive application for web and mobile. The app should have
+1. a landing screen that handles logged in and logged out users.
+2. oauth2 integration with logg in and log out functionality
+3. an account screen only accessible to client profiles showing the logged in user information
+4. an accounts screen only accessible to admin profiles showing the list of users
+
+STEP 2
+replace demo login in functionality with real login page login in to keycloak and retrieving JWT to use for subsequent calls
+
+STEP 3
+on a folder named document-service write a Quarkus application excposing 2 rest services to be accessed with JWT and validated against Keycloak on http://localhost:8080
