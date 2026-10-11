@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { AuthService } from './auth/auth.service';
@@ -10,23 +10,29 @@ import { AuthService } from './auth/auth.service';
   styleUrl: './app.scss',
   templateUrl: './app.html',
 })
-export class App {
+export class App implements OnInit {
   readonly auth = inject(AuthService);
   readonly router = inject(Router);
   readonly user = this.auth.user;
 
-  loginAsClient(): void {
-    const user = this.auth.loginAsClient();
-    this.router.navigateByUrl(user.role === 'client' ? '/account' : '/');
+  ngOnInit(): void {
+    void this.auth.init();
   }
 
-  loginAsAdmin(): void {
-    const user = this.auth.loginAsAdmin();
-    this.router.navigateByUrl(user.role === 'admin' ? '/accounts' : '/');
+  async loginAsClient(): Promise<void> {
+    await this.auth.loginAsClient();
   }
 
-  logout(): void {
-    this.auth.logout();
-    this.router.navigateByUrl('/');
+  async loginAsAdmin(): Promise<void> {
+    await this.auth.loginAsAdmin();
+  }
+
+  async loginWithKeycloak(): Promise<void> {
+    await this.auth.loginAsClient();
+  }
+
+  async logout(): Promise<void> {
+    await this.auth.logout();
+    await this.router.navigateByUrl('/');
   }
 }

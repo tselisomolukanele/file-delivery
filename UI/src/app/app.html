@@ -10,7 +10,7 @@
 
     <div class="header-actions">
       <ng-container *ngIf="!user(); else signedIn">
-        <button type="button" class="cmd-btn" (click)="loginAsClient()">Client sign in</button>
+        <button type="button" class="cmd-btn" (click)="loginWithKeycloak()">Sign in with Keycloak</button>
         <button type="button" class="cmd-btn alt" (click)="loginAsAdmin()">Admin sign in</button>
       </ng-container>
 

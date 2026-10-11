@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../../auth/auth.service';
 
@@ -13,26 +13,22 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class LandingComponent {
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   readonly user = this.auth.user;
 
-  loginAsClient(): void {
-    const user = this.auth.loginAsClient();
-    this.router.navigateByUrl(user.role === 'client' ? '/account' : '/');
+  async loginAsClient(): Promise<void> {
+    await this.auth.loginAsClient();
   }
 
-  loginAsAdmin(): void {
-    const user = this.auth.loginAsAdmin();
-    this.router.navigateByUrl(user.role === 'admin' ? '/accounts' : '/');
+  async loginAsAdmin(): Promise<void> {
+    await this.auth.loginAsAdmin();
   }
 
-  loginWithGoogle(): void {
-    this.auth.loginWithOAuth2('google', 'client');
-    this.router.navigateByUrl('/account');
+  async loginWithKeycloak(): Promise<void> {
+    await this.auth.loginAsClient();
   }
 
-  logout(): void {
-    this.auth.logout();
+  async logout(): Promise<void> {
+    await this.auth.logout();
   }
 }
