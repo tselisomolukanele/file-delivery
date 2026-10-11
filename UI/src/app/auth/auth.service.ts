@@ -1,13 +1,12 @@
 import { Injectable, computed, signal } from '@angular/core';
 import Keycloak from 'keycloak-js';
 
-export type UserRole = 'client' | 'admin';
 
 export interface AppUser {
   id: number;
   name: string;
   email: string;
-  role: UserRole;
+  roles: string[];
   company: string;
   status: string;
   avatar: string;
@@ -46,6 +45,20 @@ export class AuthService {
         this.user.set(null);
         this.clearStoredToken();
       }
+
+      if (authenticated) {
+        // The parsed access token object
+        const authObject = this.keycloak.tokenParsed; 
+        
+        // Extract realm roles safely
+        const realmRoles = authObject?.realm_access?.roles || [];
+        console.log("User Realm Roles:", realmRoles);
+
+        for (const role of realmRoles) {
+          console.log(`User has role: ${role}`);
+        }
+      }
+
     } catch (error) {
       console.error('Keycloak initialization failed', error);
       this.user.set(this.readStoredUser());
@@ -85,8 +98,7 @@ export class AuthService {
     const claims = this.keycloak.tokenParsed ?? {};
     const roleNames = (claims['realm_access'] as { roles?: string[] } | undefined)?.roles ?? [];
     const clientRoles = (claims['resource_access'] as Record<string, { roles?: string[] }> | undefined)?.[KEYCLOAK_CONFIG.clientId]?.roles ?? [];
-    const allRoles = [...roleNames, ...clientRoles];
-    const role: UserRole = allRoles.includes('admin') ? 'admin' : 'client';
+    const roles = [...roleNames, ...clientRoles];
     const givenName = typeof claims['given_name'] === 'string' ? claims['given_name'] : '';
     const familyName = typeof claims['family_name'] === 'string' ? claims['family_name'] : '';
     const name = [givenName, familyName].filter(Boolean).join(' ') || (typeof claims['preferred_username'] === 'string' ? claims['preferred_username'] : 'Keycloak User');
@@ -97,7 +109,7 @@ export class AuthService {
       id: Number(this.keycloak.subject ?? Date.now()),
       name,
       email,
-      role,
+      roles,
       company: 'Keycloak / Active Directory',
       status: 'Authenticated',
       avatar: name

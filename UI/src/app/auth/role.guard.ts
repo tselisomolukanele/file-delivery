@@ -7,7 +7,7 @@ export const clientGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (auth.user()?.role === 'client') {
+  if (auth.user()?.roles.includes('file-owner')) {
     return true;
   }
 
@@ -19,7 +19,7 @@ export const adminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (auth.user()?.role === 'admin') {
+  if (auth.user()?.roles.includes('file-uploader')) {
     return true;
   }
 

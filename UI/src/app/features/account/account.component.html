@@ -8,7 +8,12 @@
     <div class="avatar" aria-label="User avatar">{{ currentUser.avatar }}</div>
 
     <div class="profile-body">
-      <span class="role-badge">{{ currentUser.role }}</span>
+      <span class="role-badge" [class.client]="currentUser.roles.includes('file-owner')">
+        Client
+      </span>
+      <span class="role-badge" [class.admin]="currentUser.roles.includes('file-uploader')">
+        Admin
+      </span>
       <h2>{{ currentUser.name }}</h2>
       <p class="muted">{{ currentUser.email }}</p>
 

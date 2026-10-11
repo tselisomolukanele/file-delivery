@@ -14,10 +14,9 @@
     <ng-template #loggedInBanner>
       <div class="logged-in-panel">
         <h2>Welcome back, {{ user()?.name }}</h2>
-        <p>You are currently signed in as a {{ user()?.role }} profile.</p>
         <div class="cta-group compact">
-          <a *ngIf="user()?.role === 'client'" routerLink="/account" class="primary">Open account</a>
-          <a *ngIf="user()?.role === 'admin'" routerLink="/accounts" class="primary">View users</a>
+          <a *ngIf="user()?.roles.includes('file-owner')" routerLink="/account" class="primary">Open account</a>
+          <a *ngIf="user()?.roles.includes('file-uploader')" routerLink="/accounts" class="primary">View users</a>
           <button type="button" class="secondary" (click)="logout()">Log out</button>
         </div>
       </div>

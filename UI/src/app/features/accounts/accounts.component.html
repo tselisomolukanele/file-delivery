@@ -24,8 +24,11 @@
             </div>
           </td>
           <td>
-            <span class="role-badge" [class.admin]="user.role === 'admin'" [class.client]="user.role === 'client'">
-              {{ user.role }}
+            <span class="role-badge" [class.client]="user.roles.includes('file-owner')">
+              Client
+            </span>
+            <span class="role-badge" [class.admin]="user.roles.includes('file-uploader')">
+              Admin
             </span>
           </td>
           <td>{{ user.company }}</td>
