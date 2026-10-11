@@ -1,0 +1,27 @@
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" routerLink="/">FileDelivery</a>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a *ngIf="user()?.role === 'client'" routerLink="/account" routerLinkActive="active">Account</a>
+      <a *ngIf="user()?.role === 'admin'" routerLink="/accounts" routerLinkActive="active">Accounts</a>
+    </nav>
+
+    <div class="header-actions">
+      <ng-container *ngIf="!user(); else signedIn">
+        <button type="button" class="cmd-btn" (click)="loginAsClient()">Client sign in</button>
+        <button type="button" class="cmd-btn alt" (click)="loginAsAdmin()">Admin sign in</button>
+      </ng-container>
+
+      <ng-template #signedIn>
+        <span class="user-pill">{{ user()?.role }}</span>
+        <button type="button" class="cmd-btn" (click)="logout()">Log out</button>
+      </ng-template>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>

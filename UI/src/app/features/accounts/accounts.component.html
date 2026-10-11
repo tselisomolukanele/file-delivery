@@ -1,0 +1,37 @@
+<section class="page-shell">
+  <div class="page-header">
+    <p class="eyebrow">Admin access</p>
+    <h1>Accounts</h1>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Role</th>
+          <th>Company</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td class="user-cell">
+            <div class="avatar">{{ user.avatar }}</div>
+            <div>
+              <strong>{{ user.name }}</strong>
+              <span>{{ user.email }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="role-badge" [class.admin]="user.role === 'admin'" [class.client]="user.role === 'client'">
+              {{ user.role }}
+            </span>
+          </td>
+          <td>{{ user.company }}</td>
+          <td>{{ user.status }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

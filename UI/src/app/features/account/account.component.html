@@ -1,0 +1,39 @@
+<section class="page-shell">
+  <div class="page-header">
+    <p class="eyebrow">Client profile</p>
+    <h1>My account</h1>
+  </div>
+
+  <div class="profile-card" *ngIf="user() as currentUser; else signedOut">
+    <div class="avatar" aria-label="User avatar">{{ currentUser.avatar }}</div>
+
+    <div class="profile-body">
+      <span class="role-badge">{{ currentUser.role }}</span>
+      <h2>{{ currentUser.name }}</h2>
+      <p class="muted">{{ currentUser.email }}</p>
+
+      <dl class="details-grid">
+        <div>
+          <dt>Company</dt>
+          <dd>{{ currentUser.company }}</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>{{ currentUser.status }}</dd>
+        </div>
+        <div>
+          <dt>Profile</dt>
+          <dd>Client</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <ng-template #signedOut>
+    <div class="empty-state">
+      <h2>Profile unavailable</h2>
+      <p>Please sign in to view your account information.</p>
+      <a routerLink="/" class="primary-link">Back to home</a>
+    </div>
+  </ng-template>
+</section>
