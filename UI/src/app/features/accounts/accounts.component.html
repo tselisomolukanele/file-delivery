@@ -37,4 +37,22 @@
       </tbody>
     </table>
   </div>
+
+  <div class="table-card" style="margin-top: 2rem;">
+    <h2>Document Service</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let profile of documentProfiles()">
+          <td>{{ profile }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </section>
