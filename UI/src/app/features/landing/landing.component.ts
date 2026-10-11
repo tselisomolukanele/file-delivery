@@ -16,16 +16,8 @@ export class LandingComponent {
 
   readonly user = this.auth.user;
 
-  async loginAsClient(): Promise<void> {
-    await this.auth.loginAsClient();
-  }
-
-  async loginAsAdmin(): Promise<void> {
-    await this.auth.loginAsAdmin();
-  }
-
-  async loginWithKeycloak(): Promise<void> {
-    await this.auth.loginAsClient();
+  async login(): Promise<void> {
+    await this.auth.login();
   }
 
   async logout(): Promise<void> {

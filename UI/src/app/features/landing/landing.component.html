@@ -8,9 +8,7 @@
     </p>
 
     <div class="cta-group" *ngIf="!user(); else loggedInBanner">
-      <button type="button" class="primary" (click)="loginWithKeycloak()">Continue with Keycloak</button>
-      <button type="button" class="secondary" (click)="loginAsClient()">Client sign in</button>
-      <button type="button" class="ghost" (click)="loginAsAdmin()">Admin sign in</button>
+      <button type="button" class="ghost" (click)="login()">Sign in</button>
     </div>
 
     <ng-template #loggedInBanner>

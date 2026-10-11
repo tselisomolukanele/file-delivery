@@ -53,14 +53,6 @@ export class AuthService {
     }
   }
 
-  async loginAsClient(): Promise<void> {
-    await this.loginWithRole('client');
-  }
-
-  async loginAsAdmin(): Promise<void> {
-    await this.loginWithRole('admin');
-  }
-
   getAccessToken(): string | null {
     return this.keycloak.token ?? this.readStoredToken();
   }
@@ -80,8 +72,8 @@ export class AuthService {
     }
   }
 
-  private async loginWithRole(role: UserRole): Promise<void> {
-    const redirectUri = `${window.location.origin}/${role === 'client' ? 'account' : 'accounts'}`;
+  async login(): Promise<void> {
+    const redirectUri = `${window.location.origin}/`;
 
     await this.keycloak.login({
       redirectUri,

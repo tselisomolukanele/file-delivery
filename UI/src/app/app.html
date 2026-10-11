@@ -10,12 +10,11 @@
 
     <div class="header-actions">
       <ng-container *ngIf="!user(); else signedIn">
-        <button type="button" class="cmd-btn" (click)="loginWithKeycloak()">Sign in with Keycloak</button>
-        <button type="button" class="cmd-btn alt" (click)="loginAsAdmin()">Admin sign in</button>
+        <button type="button" class="cmd-btn alt" (click)="login()">Sign in</button>
       </ng-container>
 
       <ng-template #signedIn>
-        <span class="user-pill">{{ user()?.role }}</span>
+        <span class="user-pill">{{ user()?.name }}</span>
         <button type="button" class="cmd-btn" (click)="logout()">Log out</button>
       </ng-template>
     </div>
