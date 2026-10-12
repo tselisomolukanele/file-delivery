@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open Email Message</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --panel: #ffffff;
+        --panel-alt: #eef3ff;
+        --border: #dfe7f5;
+        --text: #1f2937;
+        --muted: #64748b;
+        --primary: #2d6cdf;
+        --primary-soft: #eaf1ff;
+        --sidebar: #f8fafc;
+        --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #edf3ff 0%, var(--bg) 220px);
+        color: var(--text);
+      }
+
+      body {
+        min-height: 100vh;
+        padding: 32px;
+      }
+
+      .mail-shell {
+        width: min(1280px, 100%);
+        height: calc(100vh - 64px);
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        backdrop-filter: blur(8px);
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255,255,255,0.9);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+      }
+
+      .brand-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        display: grid;
+        place-items: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .search-box {
+        width: 280px;
+        background: var(--panel-alt);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 14px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .icon-btn {
+        border: 1px solid var(--border);
+        background: #fff;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        min-height: calc(100% - 82px);
+      }
+
+      .sidebar {
+        background: var(--sidebar);
+        border-right: 1px solid var(--border);
+        padding: 18px 14px;
+      }
+
+      .compose {
+        margin-bottom: 18px;
+      }
+
+      .compose-btn {
+        width: 100%;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+        padding: 14px 16px;
+        font-weight: 700;
+        font-size: 0.96rem;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+      }
+
+      .folder-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .folder-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+
+      .folder-item.active {
+        background: var(--primary-soft);
+        color: var(--primary);
+        font-weight: 700;
+      }
+
+      .badge {
+        background: #dbeafe;
+        color: #1d4ed8;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        display: inline-grid;
+        place-items: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      .content {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        background: #fff;
+      }
+
+      .message-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(248, 250, 252, 0.9);
+      }
+
+      .toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+      }
+
+      .toolbar-btn {
+        border: 1px solid var(--border);
+        background: white;
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .message-area {
+        padding: 24px 26px 30px;
+      }
+
+      .message-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .header-block {
+        padding: 22px 22px 14px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+      }
+
+      .message-subject {
+        margin: 0 0 16px;
+        font-size: clamp(1.4rem, 2vw, 2.1rem);
+        line-height: 1.2;
+      }
+
+      .message-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .sender {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #c4b5fd, #93c5fd);
+        color: #1f2937;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+      }
+
+      .sender-name {
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .sender-email,
+      .meta-text {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tag {
+        background: #eef2ff;
+        color: #4338ca;
+        border: 1px solid #dfe7ff;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      .body-block {
+        padding: 22px;
+        color: #334155;
+        line-height: 1.75;
+        font-size: 1rem;
+      }
+
+      .body-block p {
+        margin: 0 0 1rem;
+      }
+
+      .quote {
+        margin: 24px 0;
+        padding: 14px 18px;
+        border-left: 4px solid #94a3b8;
+        background: #f8fafc;
+        border-radius: 12px;
+        color: #475569;
+      }
+
+      .attachment-panel {
+        padding: 0 22px 22px;
+      }
+
+      .attachment-box {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: #f8fafc;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .file-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .file-icon {
+        width: 42px;
+        height: 42px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+
+      .file-name {
+        font-weight: 700;
+      }
+
+      .file-size {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .download-btn {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .reply-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px 24px;
+        border-top: 1px solid var(--border);
+      }
+
+      .reply-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .primary {
+        background: var(--primary);
+        color: white;
+        border: none;
+      }
+
+      @media (max-width: 900px) {
+        body { padding: 18px; }
+        .mail-shell { height: auto; }
+        .layout { grid-template-columns: 1fr; }
+        .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+        .topbar { flex-wrap: wrap; gap: 12px; }
+        .search-box { width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+        window.onload = function() {
+            
+            document.getElementById('filename').innerText = localStorage.getItem('filename');
+            document.getElementById("downloadbutton").onclick = () => location.href=localStorage.getItem('link');
+        };
+    </script>
+    <div class="mail-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-badge">M</div>
+          <span>Mail</span>
+        </div>
+
+        <div class="top-actions">
+          <div class="search-box">Search mail</div>
+          <div class="icon-btn">+</div>
+          <div class="icon-btn">⚙</div>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="compose">
+            <button class="compose-btn">Compose</button>
+          </div>
+
+          <nav class="folder-list" aria-label="Folder navigation">
+            <div class="folder-item"><span>Inbox</span><span class="badge">14</span></div>
+            <div class="folder-item"><span>Starred</span></div>
+            <div class="folder-item"><span>Sent</span></div>
+            <div class="folder-item"><span>Drafts</span></div>
+            <div class="folder-item active"><span>Important</span><span class="badge">3</span></div>
+            <div class="folder-item"><span>Archive</span></div>
+          </nav>
+        </aside>
+
+        <main class="content">
+          <div class="message-toolbar">
+            <div class="toolbar-group">
+              <button class="toolbar-btn">← Back</button>
+              <button class="toolbar-btn">Reply</button>
+              <button class="toolbar-btn">Forward</button>
+            </div>
+
+            <div class="toolbar-group">
+              <button class="toolbar-btn">Delete</button>
+              <button class="toolbar-btn">More</button>
+            </div>
+          </div>
+
+          <div class="message-area">
+            <article class="message-card">
+              <div class="header-block">
+                <h1 class="message-subject">You have requested a document</h1>
+
+                <div class="message-meta">
+                  <div class="sender">
+                    <div class="avatar">AB</div>
+                    <div>
+                      <div class="sender-name">Alicia Brown</div>
+                      <div class="sender-email">alicia@northstarlabs.com</div>
+                    </div>
+                  </div>
+
+                  <div class="tags">
+                    <span class="tag">High Priority</span>
+                    <span class="tag">Product</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="body-block">
+                <p>Hi day values client,</p>
+
+                <p>
+                    Below is a time sensitive document that you requested. Please download the attached file and review the contents at your earliest convenience.
+                    The link will expire and will only be accesible once for your safety and security. If you have any questions or need further assistance, please do not hesitate to reach out.
+                </p>
+
+                <p>Best,<br />You favourte Bank</p>
+              </div>
+
+              <div class="attachment-panel">
+                <div class="attachment-box">
+                  <div class="file-meta">
+                    <div class="file-icon">PDF</div>
+                    <div>
+                      <div id="filename" class="file-name">no file</div>
+                    </div>
+                  </div>
+                  <button id="downloadbutton" class="download-btn" onclick="location.href='http://google.com';">Download</button>
+                </div>
+              </div>
+
+              <div class="reply-bar">
+                <div class="meta-text">To: design@northstarlabs.com</div>
+                <div class="reply-actions">
+                  <button class="toolbar-btn">Reply</button>
+                  <button class="toolbar-btn primary">Forward</button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
