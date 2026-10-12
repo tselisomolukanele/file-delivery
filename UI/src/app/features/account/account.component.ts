@@ -25,4 +25,10 @@ export class AccountComponent implements OnInit {
       error: () => this.documents.set([]),
     });
   }
+
+  goToLink(document: DocumentItem) {
+    localStorage.setItem('filename', document.name);
+    localStorage.setItem('link', document.link);
+    window.open("/email-message.html", "_blank");
+  }
 }

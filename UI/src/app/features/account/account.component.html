@@ -25,7 +25,7 @@
               <tr *ngFor="let document of documents()">
                 <td>{{ document.name }}</td>
                 <td><a href="{{ document.link }}" target="_blank">Download</a></td>
-                <td></td>
+                <td><button (click)="goToLink(document)">Email</button></td>
               </tr>
             </tbody>
           </table>
