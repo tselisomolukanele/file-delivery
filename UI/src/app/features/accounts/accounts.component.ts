@@ -58,8 +58,11 @@ export class AccountsComponent implements OnInit {
   onFormSubmit() {
     this.customerService.addCustomer(this.customerForm.value)
     .subscribe({
-      next: (response) => {
-        console.log('Customer created successfully:', response);
+      next: () => {
+        this.customerService.getProfiles().subscribe({
+          next: (profiles) => this.documentProfiles.set(profiles),
+          error: () => this.documentProfiles.set(null),
+        });
         this.customerForm.reset();
       },
       error: (error) => {

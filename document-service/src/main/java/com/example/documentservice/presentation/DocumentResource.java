@@ -18,6 +18,8 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import com.example.documentservice.service.OrcherstratorService;
 
+import io.quarkus.security.identity.SecurityIdentity;
+
 @Path("/document")
 public class DocumentResource {
 

@@ -47,17 +47,12 @@ public class DocumentLinkService {
         return entry;
     }
 
-    public DocumentLinkEntry getDocumentLink(String objectKey, String ownerId) {
+    public DocumentLinkEntry getDocumentLink(String objectKey) {
         
         var documentLinkEntry = commands.hget(STORE_KEY, objectKey);
 
         if (documentLinkEntry == null) {
             new BadRequestException("Document link not found for key: " + objectKey);
-        }
-
-        if (documentLinkEntry.getOwnerId() == null || !documentLinkEntry.getOwnerId().equals(ownerId)) {
-            log.error("Unauthorized access to document link for key: " + objectKey);
-            new ForbiddenException("Unauthorized access to document link for key: " + objectKey);
         }
 
         return documentLinkEntry;
