@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="39UPn6hjCmOtE-aBKSbL" name="Page-1">
-        <mxGraphModel dx="2269" dy="2300" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="1670" dy="1655" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -39,10 +39,13 @@
                 <mxCell id="NGn1DtYFOdNJsnpOEFkW-4" parent="1" style="swimlane;" value="Auth Service" vertex="1">
                     <mxGeometry height="150" width="160" x="455" y="-200" as="geometry"/>
                 </mxCell>
+                <mxCell id="_N9FhMymsJviNROH2MX4-2" edge="1" parent="1" source="NGn1DtYFOdNJsnpOEFkW-6" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="_N9FhMymsJviNROH2MX4-1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
                 <mxCell id="NGn1DtYFOdNJsnpOEFkW-6" parent="1" style="swimlane;" value="Document Repository" vertex="1">
                     <mxGeometry height="150" width="160" x="880" y="120" as="geometry"/>
                 </mxCell>
-                <mxCell id="NGn1DtYFOdNJsnpOEFkW-9" parent="1" style="shape=datastore;whiteSpace=wrap;html=1;" value="Document Data Store" vertex="1">
+                <mxCell id="NGn1DtYFOdNJsnpOEFkW-9" parent="1" style="shape=datastore;whiteSpace=wrap;html=1;" value="Document Metad&lt;div&gt;ata Store&lt;/div&gt;" vertex="1">
                     <mxGeometry height="60" width="70" x="440" y="430" as="geometry"/>
                 </mxCell>
                 <mxCell id="NGn1DtYFOdNJsnpOEFkW-11" parent="1" style="shape=datastore;whiteSpace=wrap;html=1;" value="Token Cache" vertex="1">
@@ -56,6 +59,9 @@
                 </mxCell>
                 <mxCell id="NGn1DtYFOdNJsnpOEFkW-21" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Public/Private Network" vertex="1">
                     <mxGeometry height="30" width="130" x="280" y="-430" as="geometry"/>
+                </mxCell>
+                <mxCell id="_N9FhMymsJviNROH2MX4-1" parent="1" style="shape=datastore;whiteSpace=wrap;html=1;" value="S3" vertex="1">
+                    <mxGeometry height="60" width="70" x="925" y="420" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
