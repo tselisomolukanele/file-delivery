@@ -1,61 +1,36 @@
 <section class="page-shell">
   <div class="page-header">
     <p class="eyebrow">Admin access</p>
-    <h1>Accounts</h1>
+    <h1>Customers</h1>
   </div>
 
-  <div class="table-card">
+  <div class="table-card" style="margin-top: 2rem;">
+    <h2>Customers</h2>
     <table>
       <thead>
         <tr>
-          <th>User</th>
-          <th>Role</th>
-          <th>Company</th>
-          <th>Status</th>
+          <th>Name</th>
+          <th>Upload</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of users">
-          <td class="user-cell">
-            <div class="avatar">{{ user.avatar }}</div>
-            <div>
-              <strong>{{ user.name }}</strong>
-              <span>{{ user.email }}</span>
-            </div>
-          </td>
+        <tr *ngFor="let profile of documentProfiles()">
+          <td>{{ profile.name }}</td>
           <td>
-            <span class="role-badge" [class.client]="user.roles.includes('file-owner')">
-              Client
-            </span>
-            <span class="role-badge" [class.admin]="user.roles.includes('file-uploader')">
-              Admin
-            </span>
+              <input type="file" class="file-input" (change)="onFileSelected(profile.name, $event)" #fileUpload>
           </td>
-          <td>{{ user.company }}</td>
-          <td>{{ user.status }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <div class="table-card" style="margin-top: 2rem;">
-    <h2>Document Service</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let profile of documentProfiles()">
-          <td>{{ profile }}</td>
-          <td>
-              <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <h2>New Customer</h2>
+    <form [formGroup]="customerForm" (ngSubmit)="onFormSubmit()">
+      <label for="first-name">Name: </label>
+      <input placeholder="Name" formControlName="name">
+      <button type="submit" [disabled]="!customerForm.valid">New Customer</button>
+    </form>
   </div>
+
 </section>

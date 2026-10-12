@@ -8,12 +8,14 @@ import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.redis.datasource.hash.HashCommands;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import lombok.extern.slf4j.Slf4j;
 
 @ApplicationScoped
 @Slf4j
+@Transactional
 public class DocumentLinkService {
 
     private static final String STORE_KEY = "document-links";

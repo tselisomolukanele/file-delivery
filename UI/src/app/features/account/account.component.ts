@@ -3,7 +3,8 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../../auth/auth.service';
-import { DocumentItem, DocumentProfile, DocumentService } from '../../services/document.service';
+import { DocumentItem } from '../../services/document.service';
+import { CustomerService } from '../../services/cutomer.service';
 
 @Component({
   selector: 'app-account',
@@ -14,12 +15,12 @@ import { DocumentItem, DocumentProfile, DocumentService } from '../../services/d
 })
 export class AccountComponent implements OnInit {
   readonly auth = inject(AuthService);
-  readonly documentService = inject(DocumentService);
+  readonly customerService = inject(CustomerService);
   readonly user = this.auth.user;
   readonly documents = signal<DocumentItem[]>([]);
 
   ngOnInit(): void {
-    this.documentService.getDocuments().subscribe({
+    this.customerService.getDocuments().subscribe({
       next: (items) => this.documents.set(items),
       error: () => this.documents.set([]),
     });
