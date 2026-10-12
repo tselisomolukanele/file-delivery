@@ -9,27 +9,32 @@ export interface DocumentProfile {
 }
 
 export interface DocumentItem {
-  id: string;
   name: string;
-  status: string;
+  link: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
-  private readonly baseUrl = 'http://localhost:8081/api';
+  private readonly baseUrl = 'http://localhost:8081';
 
   getProfiles(): Observable<DocumentProfile[]> {
-    return this.http.get<DocumentProfile[]>(`${this.baseUrl}/profiles`, {
+    return this.http.get<DocumentProfile[]>(`${this.baseUrl}/api/profiles`, {
       headers: this.buildHeaders(),
     });
   }
 
   getDocuments(): Observable<DocumentItem[]> {
-    return this.http.get<DocumentItem[]>(`${this.baseUrl}/documents`, {
+    return this.http.get<DocumentItem[]>(`${this.baseUrl}/api/documents`, {
       headers: this.buildHeaders(),
     });
+  }
+
+  uploadDocument(formData: FormData): Observable<DocumentItem[]> {
+    return this.http.post<DocumentItem[]>(`${this.baseUrl}/document/upload`, 
+      formData,
+      { headers: this.buildHeaders()});
   }
 
   private buildHeaders(): HttpHeaders {

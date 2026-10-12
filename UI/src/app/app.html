@@ -14,7 +14,7 @@
       </ng-container>
 
       <ng-template #signedIn>
-        <span class="user-pill">{{ user()?.name }} {{ user() | json }}</span>
+        <span class="user-pill">{{ user()?.name }}</span>
         <button type="button" class="cmd-btn" (click)="logout()">Log out</button>
       </ng-template>
     </div>

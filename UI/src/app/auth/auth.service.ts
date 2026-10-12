@@ -45,20 +45,6 @@ export class AuthService {
         this.user.set(null);
         this.clearStoredToken();
       }
-
-      if (authenticated) {
-        // The parsed access token object
-        const authObject = this.keycloak.tokenParsed; 
-        
-        // Extract realm roles safely
-        const realmRoles = authObject?.realm_access?.roles || [];
-        console.log("User Realm Roles:", realmRoles);
-
-        for (const role of realmRoles) {
-          console.log(`User has role: ${role}`);
-        }
-      }
-
     } catch (error) {
       console.error('Keycloak initialization failed', error);
       this.user.set(this.readStoredUser());

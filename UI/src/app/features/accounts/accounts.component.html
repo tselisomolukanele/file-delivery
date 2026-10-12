@@ -51,6 +51,9 @@
       <tbody>
         <tr *ngFor="let profile of documentProfiles()">
           <td>{{ profile }}</td>
+          <td>
+              <input type="file" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+          </td>
         </tr>
       </tbody>
     </table>

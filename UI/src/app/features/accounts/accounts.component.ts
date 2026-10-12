@@ -16,6 +16,7 @@ export class AccountsComponent implements OnInit {
   readonly documentService = inject(DocumentService);
   readonly users = this.auth.users;
   readonly documentProfiles = signal<DocumentProfile[] | null>(null);
+  fileName = '';
 
     ngOnInit(): void {
     this.documentService.getProfiles().subscribe({
@@ -23,4 +24,26 @@ export class AccountsComponent implements OnInit {
       error: () => this.documentProfiles.set(null),
     });
   }
+
+  onFileSelected(event: any) {
+
+        const file:File = event.target.files[0];
+
+        if (file) {
+
+            this.fileName = file.name;
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("filename", file.name);
+            formData.append("mimetype", file.type);
+            this.documentService.uploadDocument(formData).subscribe({
+                next: (documents) => {
+                    console.log('Documents uploaded successfully:', documents);
+                },
+                error: (error) => {
+                    console.error('Error uploading documents:', error);
+                }
+            });
+        }
+    }
 }

@@ -8,29 +8,31 @@
     <div class="avatar" aria-label="User avatar">{{ currentUser.avatar }}</div>
 
     <div class="profile-body">
-      <span class="role-badge" [class.client]="currentUser.roles.includes('file-owner')">
-        Client
-      </span>
-      <span class="role-badge" [class.admin]="currentUser.roles.includes('file-uploader')">
-        Admin
-      </span>
       <h2>{{ currentUser.name }}</h2>
       <p class="muted">{{ currentUser.email }}</p>
 
-      <dl class="details-grid">
+      <dl>
         <div>
-          <dt>Company</dt>
-          <dd>{{ currentUser.company }}</dd>
-        </div>
-        <div>
-          <dt>Status</dt>
-          <dd>{{ currentUser.status }}</dd>
-        </div>
-        <div>
-          <dt>Documents</dt>
-          <dd>{{ documents() | json }}</dd>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Download</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let document of documents()">
+                <td>{{ document.name }}</td>
+                <td><a href="{{ document.link }}" target="_blank">Download</a></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </dl>
+
+
     </div>
   </div>
 
