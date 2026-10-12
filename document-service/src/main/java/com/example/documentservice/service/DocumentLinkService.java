@@ -5,31 +5,33 @@ import java.util.UUID;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.quarkus.redis.datasource.RedisDataSource;
-import io.quarkus.redis.datasource.hash.HashCommands;
+import io.quarkus.redis.datasource.value.SetArgs;
+import io.quarkus.redis.datasource.value.ValueCommands;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @ApplicationScoped
 @Slf4j
 @Transactional
 public class DocumentLinkService {
-
-    private static final String STORE_KEY = "document-links";
     
     @ConfigProperty(name = "host.base.url")
     String baseUrl;
 
+    @ConfigProperty(name = "token.ttl")
+    int tokenTtl;
+
     @Inject 
     RedisDataSource ds;
 
-    private final HashCommands<String, String, DocumentLinkEntry> commands;
+    private final ValueCommands<String, DocumentLinkEntry> valueCommands;
 
     public DocumentLinkService(RedisDataSource ds) { 
-        commands = ds.hash(DocumentLinkEntry.class); 
+        valueCommands = ds.value(DocumentLinkEntry.class);
     }
 
     public DocumentLinkEntry createDocumentLink(String documentId, String ownerId) {
@@ -42,17 +44,17 @@ public class DocumentLinkService {
         entry.setOwnerId(ownerId);
         entry.setLink(baseUrl + "/document/download/" + uuid);
 
-        commands.hset(STORE_KEY, uuid, entry);
+        valueCommands.set(uuid, entry, new SetArgs().ex(tokenTtl));
 
         return entry;
     }
 
     public DocumentLinkEntry getDocumentLink(String objectKey) {
         
-        var documentLinkEntry = commands.hget(STORE_KEY, objectKey);
+        var documentLinkEntry = valueCommands.getdel(objectKey);
 
         if (documentLinkEntry == null) {
-            new BadRequestException("Document link not found for key: " + objectKey);
+            throw new NotFoundException("Document link not found for key: " + objectKey);
         }
 
         return documentLinkEntry;
