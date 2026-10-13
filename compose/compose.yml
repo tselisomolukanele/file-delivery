@@ -20,8 +20,6 @@ services:
     image: luofuxiang/local-s3
     volumes:
       - ./s3/data:/data
-    ports:
-      - 8085:80
   file-delivery-service:
     image: tseliso/document-service:1.0.0-SNAPSHOT
     depends_on:
@@ -44,3 +42,9 @@ services:
       DB_PORT: ${DB_PORT}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+  file-delivery-ui:
+    image: file-delivery-ui:latest
+    depends_on:
+      - file-delivery-service
+    ports:
+      - 8085:80

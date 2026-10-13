@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 import { DocumentItem, DocumentProfile } from './document.service';
 
@@ -9,7 +10,7 @@ import { DocumentItem, DocumentProfile } from './document.service';
 export class CustomerService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
-  private readonly baseUrl = 'http://localhost:8081';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   addCustomer(customer: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/api/customers`, 

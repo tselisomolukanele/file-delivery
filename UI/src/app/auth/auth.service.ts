@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import Keycloak from 'keycloak-js';
 
+import { environment } from '../../environments/environment';
 
 export interface AppUser {
   id: number;
@@ -13,9 +14,9 @@ export interface AppUser {
 }
 
 const KEYCLOAK_CONFIG = {
-  url: 'http://localhost:8080',
-  realm: 'file-delivery',
-  clientId: 'file-delivery-ui',
+  url: environment.keycloak.url,
+  realm: environment.keycloak.realm,
+  clientId: environment.keycloak.clientId,
 };
 
 const JWT_STORAGE_KEY = 'file-delivery.jwt';

@@ -25,8 +25,8 @@ public class DocumentDataService {
     @ConfigProperty(name = "bucket.name")
     String bucketName;
 
-    public DocumentData downloadFile(String fileName) {
-        var getObjectRequest = buildGetRequest(fileName);
+    public DocumentData downloadFile(String owner, String fileName) {
+        var getObjectRequest = buildGetRequest(owner + "_" + fileName);
         ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(getObjectRequest);
 
         byte[] data = objectBytes.asByteArray();

@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
-import { DocumentService } from './document.service';
+import { environment } from '../../environments/environment';
 import { AuthService } from '../auth/auth.service';
+import { DocumentService } from './document.service';
 
 describe('DocumentService', () => {
   let service: DocumentService;
@@ -30,9 +31,9 @@ describe('DocumentService', () => {
       expect(profile.username).toBe('alice');
     });
 
-    const req = httpMock.expectOne('http://localhost:8081/api/profile');
+    const req = httpMock.expectOne(`${environment.apiBaseUrl}/api/profile`);
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('Authorization')).toBe('Bearer demo-token');
-    req.flush({ username: 'alice', issuer: 'http://localhost:8080/realms/document-service', roles: ['user'] });
+    req.flush({ username: 'alice', issuer: `${environment.authBaseUrl}/realms/document-service`, roles: ['user'] });
   });
 });

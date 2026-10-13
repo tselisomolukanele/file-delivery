@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 
 export interface DocumentProfile {
@@ -17,7 +18,7 @@ export interface DocumentItem {
 export class DocumentService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
-  private readonly baseUrl = 'http://localhost:8081';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   uploadDocument(formData: FormData): Observable<DocumentItem[]> {
     return this.http.post<DocumentItem[]>(`${this.baseUrl}/document/upload`, 

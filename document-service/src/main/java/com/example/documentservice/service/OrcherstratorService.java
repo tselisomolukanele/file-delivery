@@ -28,7 +28,7 @@ public class OrcherstratorService {
 
     public DocumentData getDocumentData(String objectKey) {
         var documentLinkEntry = documentLinkService.getDocumentLink(objectKey);
-        var documentData = documentDataService.downloadFile(documentLinkEntry.getOwnerId() + "_" +documentLinkEntry.getDocumentId());
+        var documentData = documentDataService.downloadFile(documentLinkEntry.getOwnerId(), documentLinkEntry.getDocumentId());
         return documentData;
     }
 }
