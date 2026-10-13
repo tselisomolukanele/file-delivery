@@ -1,5 +1,5 @@
 const apiBaseUrl = 'http://file-delivery-service:8081';
-const authBaseUrl = 'http://keycloak:8080';
+const authBaseUrl = 'http://localhost:8084';
 const keycloakRealm = 'file-delivery';
 const keycloakClientId = 'file-delivery-ui';
 

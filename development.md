@@ -23,3 +23,5 @@ The implemantation was carried out following the steps outlined below
 Using Keycloak for our auth service and following these [instructions](https://www.keycloak.org/getting-started/getting-started-docker) a new realm and client was created with the named `file-delivery` and `file-delivery-ui`.
 
 Have set all redirect and CORS settting to * to avoid failure.  Should change them and make them specific to the eventual environment.
+### S3 Service
+Set up following this Docker (image)[https://hub.docker.com/r/luofuxiang/local-s3]
