@@ -1,11 +1,6 @@
 <section class="hero">
   <div class="hero-copy">
     <p class="eyebrow">Secure delivery workspace</p>
-    <h1>Move files with confidence and clarity.</h1>
-    <p class="subtitle">
-      FileDelivery gives clients and admins a responsive portal for secure access, account management,
-      and team visibility from any device.
-    </p>
 
     <div class="cta-group" *ngIf="!user(); else loggedInBanner">
       <button type="button" class="ghost" (click)="login()">Sign in</button>
@@ -31,39 +26,5 @@
         <strong>Healthy</strong>
       </div>
     </div>
-    <div class="metric-stack">
-      <div>
-        <span>Uploads today</span>
-        <strong>1,248</strong>
-      </div>
-      <div>
-        <span>Active users</span>
-        <strong>46</strong>
-      </div>
-      <div>
-        <span>Avg. delivery</span>
-        <strong>4.2 min</strong>
-      </div>
-    </div>
   </div>
-</section>
-
-<section class="feature-grid">
-  <article class="feature-card">
-    <span class="feature-tag">Authenticated</span>
-    <h3>Secure login</h3>
-    <p>OAuth2-style access with session persistence and instant logout support.</p>
-  </article>
-
-  <article class="feature-card">
-    <span class="feature-tag">Client</span>
-    <h3>Profile access</h3>
-    <p>Clients can view and manage their own account information in a protected screen.</p>
-  </article>
-
-  <article class="feature-card">
-    <span class="feature-tag">Admin</span>
-    <h3>Users overview</h3>
-    <p>Admins can review who is in the system with a dedicated account list screen.</p>
-  </article>
 </section>
