@@ -51,7 +51,7 @@ class DocumentDataServiceTest {
 
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(objectBytes);
 
-        DocumentData result = service.downloadFile("notes.txt");
+        DocumentData result = service.downloadFile(null, "notes.txt");
 
         assertEquals("notes.txt", result.getFilename());
         assertEquals("text/plain", result.getMimetype());
@@ -67,7 +67,7 @@ class DocumentDataServiceTest {
 
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(objectBytes);
 
-        assertThrows(NotFoundException.class, () -> service.downloadFile("empty.txt"));
+        assertThrows(NotFoundException.class, () -> service.downloadFile(null, "empty.txt"));
     }
 
     @Test

@@ -2,7 +2,6 @@ package com.example.documentservice.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -11,7 +10,6 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.lang.reflect.Field;
 
-import com.example.documentservice.persistence.model.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -63,7 +61,7 @@ class OrcherstratorServiceTest {
         );
 
         when(documentLinkService.getDocumentLink("token-1")).thenReturn(linkEntry);
-        when(documentDataService.downloadFile("alice_invoice.pdf")).thenReturn(expected);
+        when(documentDataService.downloadFile("alice", "invoice.pdf")).thenReturn(expected);
 
         DocumentData result = service.getDocumentData("token-1");
 
