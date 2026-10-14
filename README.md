@@ -22,7 +22,6 @@ To build respective docker images run the following commands
     - `mvn install -Dquarkus.container-image.build=true` resulting Docker image *<configured-docker-username>document-service:1.0.0-SNAPSHOT*
 - Frontend
     - `cd UI`
-    - `npm run build`
     - `docker build -t file-delivery-ui .` resulting Docker image *file-delivery-ui:latest*
 
 ### Running (Dev mode)

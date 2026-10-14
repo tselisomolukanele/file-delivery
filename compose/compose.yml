@@ -1,50 +1,99 @@
+# The following are externally exposed endpoints
+# The applation UI            8080
+# Keycloak                    8081
+# API service                 8082
+
+# For access to Keycloak as admin
+# username                    security
+# password                    sEcur1ty
+
+# The S3 access details as per S3 setup in mounted volume
+# access key                  test-key
+# access secret               test-secret
+
+# The following are property values that are used by more then one image and need to be consistent
+# Database port               5432
+# Database                    databasepassword
+# Database username           databaseusername
+# Redis port                  6379
+
 services:
   redis:
     image: redis:latest
-    command: --port ${REDIS_PORT}
-  database:
-    image: postgres
-    command: -p ${DB_PORT}
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USERNAME}
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.8.0
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-    command: -v start-dev --import-realm
-    volumes:
-      - ./keycloak/file-delivery.json:/opt/keycloak/data/import/file-delivery.json
+    command: --port 6379
   s3:
     image: luofuxiang/local-s3
     volumes:
       - ./s3/data:/data
+  database:
+    image: postgres
+    command: -p 5432
+    environment:
+      POSTGRES_PASSWORD: databasepassword
+      POSTGRES_USER: databaseusername
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.0
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: security
+      KC_BOOTSTRAP_ADMIN_PASSWORD: sEcur1ty
+      KC_HEALTH_ENABLED: true
+    command: -v start-dev --import-realm
+    configs:
+      - target: /opt/keycloak/data/import/file-delivery.json
+        source: config_for_keycloak
+    ports:
+      - 8081:8080
+      - 9000:9000
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '\"status\": \"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
   file-delivery-service:
     image: tseliso/document-service:1.0.0-SNAPSHOT
     depends_on:
-      - redis
-      - database
-      - keycloak
-      - s3
+      keycloak:
+          condition: service_healthy
+      redis: 
+        condition: service_started
+      database: 
+        condition: service_started
+      s3: 
+        condition: service_started
+    ports:
+      - 8082:80
     environment:
       FILE_DILEVERY_SERVER_HOST: "file-delivery-service"
-      FILE_DILEVERY_SERVER_PORT: ${FILE_DILEVERY_SERVER_PORT}
+      FILE_DILEVERY_SERVER_PORT: 80
       KEYCLOAK_SERVER: "keycloak"
       KEYCLOAK_PORT: 8080
       S3_HOST: "s3"
       S3_PORT: 4566
-      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
-      S3_ACCESS_SECRET: ${S3_ACCESS_SECRET}
+      S3_ACCESS_KEY_ID: test-key
+      S3_ACCESS_SECRET: test-secret
       REDIS_HOST: redis
-      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PORT: 6379
       DB_HOST: "database"
-      DB_PORT: ${DB_PORT}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: 5432
+      DB_USERNAME: databaseusername
+      DB_PASSWORD: databasepassword
   file-delivery-ui:
     image: file-delivery-ui:latest
     depends_on:
       - file-delivery-service
+    configs:
+      - target: /usr/share/nginx/html/config.json
+        source: config_for_ui
     ports:
-      - 8085:80
+      - 8080:80
+
+configs:
+  config_for_keycloak:
+    file: ./keycloak/file-delivery.json
+  config_for_ui:
+    content: |
+      {
+          "apiBaseUrl": "http://localhost:8082",
+          "authBaseUrl": "http://localhost:8081"
+      }
