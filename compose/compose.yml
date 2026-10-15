@@ -78,6 +78,15 @@ services:
       DB_PORT: 5432
       DB_USERNAME: databaseusername
       DB_PASSWORD: databasepassword
+# --- FORCE THESE OVERRIDES FOR OIDC PROD ENGINE ---
+      QUARKUS_OIDC_AUTH_SERVER_URL: "http://keycloak:8080/realms/file-delivery"
+      QUARKUS_OIDC_TOKEN_ISSUER: "http://localhost:8081/realms/file-delivery"
+      QUARKUS_OIDC_DISCOVERY_ENABLED: "false"
+      QUARKUS_OIDC_JWKS_PATH: "/protocol/openid-connect/certs"
+      QUARKUS_HTTP_AUTH_PROACTIVE: "false"
+# Force Runtime System Logging to output to console regardless of build profile
+      QUARKUS_LOG_CATEGORY__IO_QUARKUS_OIDC__LEVEL: "TRACE"
+      QUARKUS_LOG_CATEGORY__IO_QUARKUS_SECURITY__LEVEL: "TRACE"
   file-delivery-ui:
     image: file-delivery-ui:latest
     depends_on:
