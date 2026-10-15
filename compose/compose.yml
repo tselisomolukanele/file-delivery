@@ -24,8 +24,9 @@ services:
     command: --port 6379
   s3:
    image: luofuxiang/local-s3
-   volumes:
-     - ./s3/data:/data
+   configs:
+     - target: /data/quarkus.s3.file-delivery-bucket.bucket.meta
+       source: config_for_s3
    ports:
      - 8083:80
   database:
@@ -104,6 +105,9 @@ services:
       - 8080:80
 
 configs:
+  config_for_s3:
+    content: |
+      {"objectMap":{},"creationDate":1791780526661,"region":"local","uploads":{},"versioningEnabled":null,"bucketName":"quarkus.s3.file-delivery-bucket","tagging":null,"acl":null,"policy":null,"replication":null,"encryption":null,"publicAccessBlock":null}
   config_for_keycloak:
     file: ./keycloak/file-delivery.json
   config_for_ui:
