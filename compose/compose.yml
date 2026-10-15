@@ -51,7 +51,7 @@ services:
       retries: 15
       start_period: 30s
   file-delivery-service:
-    image: tseliso/document-service:1.0.0-SNAPSHOT
+    image: filedelivery-api
     depends_on:
       keycloak:
           condition: service_healthy

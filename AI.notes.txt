@@ -24,3 +24,6 @@ add httpInterceptor to newly created NgModule
 
 Step 7: simulate email
 in the UI project write a static HTML pae that mimicks an email client open email message
+
+Step 8: staged Dockerfile for application
+create a Dockerfile to run the Quarkus app under document-service. Make sure it is native
