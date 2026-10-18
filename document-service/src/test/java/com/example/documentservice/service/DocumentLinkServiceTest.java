@@ -48,7 +48,7 @@ class DocumentLinkServiceTest {
         assertNotNull(result.getId());
         assertEquals("invoice.pdf", result.getDocumentId());
         assertEquals("alice", result.getOwnerId());
-        assertTrue(result.getLink().startsWith("https://example.com/document/download/"));
+        assertTrue(result.getLink().startsWith("https://example.com/api/document/download/"));
         verify(valueCommands).set(anyString(), any(DocumentLinkEntry.class), any(SetArgs.class));
     }
 

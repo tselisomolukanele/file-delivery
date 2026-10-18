@@ -19,7 +19,7 @@ To build respective docker images run the following commands
 - `source .env`
 - Backend
     - `cd document-service`
-    - `mvn install -Dquarkus.container-image.build=true` resulting Docker image *<configured-docker-username>document-service:1.0.0-SNAPSHOT*
+    - `docker build -t filedelivery-api .` resulting Docker image *<configured-docker-username>document-service:1.0.0-SNAPSHOT*
 - Frontend
     - `cd UI`
     - `docker build -t file-delivery-ui .` resulting Docker image *file-delivery-ui:latest*

@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class DocumentLinkService {
     
-    @ConfigProperty(name = "host.base.url")
+    @ConfigProperty(name = "document.link.base.url")
     String baseUrl;
 
     @ConfigProperty(name = "token.ttl")
@@ -41,7 +41,7 @@ public class DocumentLinkService {
         entry.setId(uuid);
         entry.setDocumentId(documentId);
         entry.setOwnerId(ownerId);
-        entry.setLink(baseUrl + "/document/download/" + uuid);
+        entry.setLink(baseUrl + "/api/document/download/" + uuid);
 
         valueCommands.set(uuid, entry, new SetArgs().ex(tokenTtl));
 

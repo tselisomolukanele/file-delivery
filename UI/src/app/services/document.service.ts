@@ -21,7 +21,7 @@ export class DocumentService {
   private readonly baseUrl = environment.apiBaseUrl;
 
   uploadDocument(formData: FormData): Observable<DocumentItem[]> {
-    return this.http.post<DocumentItem[]>(`${this.baseUrl}/document/upload`, 
+    return this.http.post<DocumentItem[]>(`${this.baseUrl}/api/document/upload`, 
       formData,
       { headers: this.buildHeaders()});
   }

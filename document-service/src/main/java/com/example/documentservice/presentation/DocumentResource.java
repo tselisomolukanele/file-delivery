@@ -18,9 +18,7 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import com.example.documentservice.service.OrcherstratorService;
 
-import io.quarkus.security.identity.SecurityIdentity;
-
-@Path("/document")
+@Path("/api/document")
 public class DocumentResource {
 
     @Inject 
@@ -43,6 +41,7 @@ public class DocumentResource {
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @RolesAllowed({"file-uploader"})
+
     public Response uploadFile(
         @MultipartForm FormData formData) 
         throws Exception {
