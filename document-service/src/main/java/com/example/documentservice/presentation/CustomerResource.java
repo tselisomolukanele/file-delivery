@@ -2,7 +2,6 @@ package com.example.documentservice.presentation;
 
 import java.util.List;
 
-import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 import com.example.documentservice.service.CustomerService;
@@ -16,6 +15,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 
 @Path("/api/customers")
@@ -51,7 +51,12 @@ public class CustomerResource {
     }
 
     @ServerExceptionMapper
-    public RestResponse<String> mapException(ClientErrorException exception) {
-        return RestResponse.status(exception.getResponse().getStatus(),  exception.getMessage());
+    public Response mapException(ClientErrorException exception) {
+        return
+            Response
+                .status(exception.getResponse().getStatus())
+                .entity(exception.getMessage())
+                .type(MediaType.TEXT_PLAIN)
+                .build();
     }
 }
