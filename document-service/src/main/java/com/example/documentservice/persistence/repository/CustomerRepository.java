@@ -24,8 +24,4 @@ public class CustomerRepository implements PanacheRepository<Customer> {
     public List<Customer> findAllWithDocuments() {
         return list("select c from Customer c left join fetch c.documents d");
     }
-
-    public Optional<Customer> findByUuid(String customerUuid) {
-        return find("uuid", customerUuid).firstResultOptional();
-    }
 }
