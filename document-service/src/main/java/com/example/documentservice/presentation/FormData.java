@@ -17,5 +17,9 @@ public class FormData {
 
     @RestForm
     @PartType(MediaType.TEXT_PLAIN)
+    public String mimetype;
+
+    @RestForm
+    @PartType(MediaType.TEXT_PLAIN)
     public String customerName;
 }
