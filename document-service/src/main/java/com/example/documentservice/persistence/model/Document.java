@@ -1,5 +1,7 @@
 package com.example.documentservice.persistence.model;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,6 +24,15 @@ public class Document {
     @Column(nullable = false)
     private String filename;
 
+    @Column(nullable = false)
+    private LocalDateTime uploadedAt;
+
+    @Column(nullable = false)
+    private String uploadedBy;
+
+    @Column(nullable = false)
+    private int fileSize;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     @JsonIgnore
@@ -40,6 +51,30 @@ public class Document {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public int getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(int fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public LocalDateTime getUploadedAt() {
+        return uploadedAt;
+    }
+
+    public void setUploadedAt(LocalDateTime uploadedAt) {
+        this.uploadedAt = uploadedAt;
+    }
+
+    public String getUploadedBy() {
+        return uploadedBy;
+    }
+
+    public void setUploadedBy(String uploadedBy) {
+        this.uploadedBy = uploadedBy;
     }
 
     public Customer getCustomer() {

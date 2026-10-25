@@ -1,5 +1,6 @@
 package com.example.documentservice.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,8 @@ public class CustomerService {
                 documentEntity ->
                 DocumentDTO.builder()
                     .name(documentEntity.getFilename())
+                    .size(documentEntity.getFileSize())
+                    .uploadedAt(documentEntity.getUploadedAt())
                     .link(
                         documentLinkService.createDocumentLink(documentEntity.getFilename(), 
                         securityIdentity.getPrincipal().getName()).getLink()
@@ -71,6 +74,8 @@ public class CustomerService {
 
         var newDocument = new Document();
         newDocument.setFilename(filename);
+        newDocument.setUploadedAt(LocalDateTime.now());
+        newDocument.setUploadedBy(securityIdentity.getPrincipal().getName());
 
         customerRepository.findByName(customerName)
             .orElseThrow(() -> new NotFoundException("Customer not found"))

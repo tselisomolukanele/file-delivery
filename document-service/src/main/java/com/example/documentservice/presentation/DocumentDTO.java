@@ -1,5 +1,7 @@
 package com.example.documentservice.presentation;
 
+import java.time.LocalDateTime;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,5 +9,7 @@ import lombok.Data;
 @Builder
 public class DocumentDTO {
     private String name;
+    private LocalDateTime uploadedAt;
+    private int size;
     private String link;
 }
