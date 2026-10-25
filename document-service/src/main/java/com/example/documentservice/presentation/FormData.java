@@ -2,6 +2,7 @@ package com.example.documentservice.presentation;
 
 import java.io.File;
 import jakarta.ws.rs.core.MediaType;
+
 import org.jboss.resteasy.reactive.PartType;
 import org.jboss.resteasy.reactive.RestForm;
 
@@ -16,10 +17,5 @@ public class FormData {
 
     @RestForm
     @PartType(MediaType.TEXT_PLAIN)
-    public String mimetype;
-
-    @RestForm
-    @PartType(MediaType.TEXT_PLAIN)
     public String customerName;
-
 }

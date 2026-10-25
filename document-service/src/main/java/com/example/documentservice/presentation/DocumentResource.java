@@ -13,8 +13,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
-import org.jboss.resteasy.reactive.MultipartForm;
-import org.jboss.resteasy.reactive.RestResponse;
+
+import org.apache.tika.Tika;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import com.example.documentservice.service.OrcherstratorService;
 
@@ -41,26 +41,52 @@ public class DocumentResource {
     @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @RolesAllowed({"file-uploader"})
-
-    public Response uploadFile(
-        @MultipartForm FormData formData) 
+    public Response uploadFile(FormData formData)
         throws Exception {
 
         if (formData.filename == null || formData.filename.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST.getStatusCode(), "Filename is required").build();
+            return Response
+                .status(Status.BAD_REQUEST.getStatusCode())
+                .entity("Filename is required")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
         }
 
-        if (formData.mimetype == null || formData.mimetype.isEmpty()) {
-            return Response.status(Status.BAD_REQUEST.getStatusCode(), "MIME type is required").build();
+        if (formData.customerName == null || formData.customerName.isEmpty()) {
+            return Response
+                .status(Status.BAD_REQUEST.getStatusCode())
+                .entity("Customer is required")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
         }
 
-        orchestrator.createAndUploadDocument(formData.customerName, formData.data, formData.filename, formData.mimetype);
+        Tika tika = new Tika();
+        var fileType = tika.detect(formData.data);
+        if (!"application/pdf".equals(fileType)) {
+            return Response
+                .status(Status.BAD_REQUEST.getStatusCode())
+                .entity("File upload is not a valid PDF")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
+        }
+
+        orchestrator.createAndUploadDocument(
+            formData.customerName, 
+            formData.data, 
+            formData.filename, 
+            fileType
+        );
 
         return Response.ok().status(Status.CREATED).build();
     }
 
     @ServerExceptionMapper
-    public RestResponse<String> mapException(ClientErrorException exception) {
-        return RestResponse.status(exception.getResponse().getStatus(),  exception.getMessage());
+    public Response mapException(ClientErrorException exception) {
+        return
+            Response
+                .status(exception.getResponse().getStatus())
+                .entity(exception.getMessage())
+                .type(MediaType.TEXT_PLAIN)
+                .build();
     }
 }
