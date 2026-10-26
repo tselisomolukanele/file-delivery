@@ -16,6 +16,10 @@ export const environment = {
 
 // Read contents of hosted config file and replace environment values if present
 const response = await fetch('/config.json')
+  .catch(error => {
+      console.error(`Error loading external configs loaded on system, default configs will be applied. ${error}`)
+      return { ok: false, status: 500, json: () => {} }
+  })
 
 if (!response.ok) {
   console.warn(`No external configs loaded on system ${response.status}, default configs applied.`)

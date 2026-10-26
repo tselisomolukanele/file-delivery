@@ -42,7 +42,6 @@ export class AccountsComponent implements OnInit {
           const formData = new FormData();
           formData.append("file", file);
           formData.append("filename", file.name);
-          formData.append("mimetype", file.type);
           formData.append("customerName", customerName);
           this.documentService.uploadDocument(formData).subscribe({
               next: (documents) => {

@@ -12,9 +12,6 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       const status = error.status;
-      console.log(error.error)
-
-      console.log("status: " + status)
       if (status === 401) {
         const tokenExpired = auth.isTokenExpired() || !auth.getAccessToken();
 
@@ -34,7 +31,6 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       if (status >= 400) {
-        console.log("again: " + status)
         const message =
           status >= 500
             ? 'System error, please contact support'
@@ -45,7 +41,6 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
               error.message ||
               'An unexpected error occurred.';
 
-        console.log("wheres my toast: " + status)
         toastr.error(message, `Request failed (${status})`, {
           timeOut: 5000,
           closeButton: true,
