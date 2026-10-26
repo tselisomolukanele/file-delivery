@@ -1,29 +1,35 @@
 prompt for UI
-STEP 1
+####
 please create an angular resposnsive application for web and mobile. The app should have
 1. a landing screen that handles logged in and logged out users.
 2. oauth2 integration with logg in and log out functionality
 3. an account screen only accessible to client profiles showing the logged in user information
 4. an accounts screen only accessible to admin profiles showing the list of users
 
-STEP 2
+####
 replace demo login in functionality with real login page login in to keycloak and retrieving JWT to use for subsequent calls
 
-STEP 3
+####
 on a folder named document-service write a Quarkus application excposing 2 rest services to be accessed with JWT and validated against Keycloak on http://localhost:8080
 
-STEP 4
+####
 on the UI project create a new service that can make a call to the document service and inject it in the account and accounts components
 
-STEP 5
+####
 in the document-service folder add a DB repository to the Quarkus project for Customer having a list of Document
 
-Step 6: add http interceptor
+####: add http interceptor
 add a custom NgModule to the UI project
 add httpInterceptor to newly created NgModule
 
-Step 7: simulate email
+####: simulate email
 in the UI project write a static HTML pae that mimicks an email client open email message
 
-Step 8: staged Dockerfile for application
+####: staged Dockerfile for application
 create a Dockerfile to run the Quarkus app under document-service. Make sure it is native
+
+####" reverse proxy
+configure the api service named file-delivery-service to be under a reverse proxy on the service named file-delivery-ui which runs nginx. the service descriptions are mapped out on the docker compose file
+
+####
+in the quarkus project document-service, increase unit test coverage and add integration tests
