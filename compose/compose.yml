@@ -30,8 +30,6 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_USER: ${DATABASE_USER}
-    ports:
-    - 5433:5432
   keycloak-db:
     image: postgres
     healthcheck:
@@ -134,8 +132,6 @@ services:
       QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_ACCESS_KEY_ID: ${S3_KEY}
       QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_SECRET_ACCESS_KEY: ${S3_SECRET}
       QUARKUS_S3_PATH_STYLE_ACCESS: true
-    ports:
-      - 8081:80
   file-delivery-ui:
     image: file-delivery-ui:latest
     depends_on:
