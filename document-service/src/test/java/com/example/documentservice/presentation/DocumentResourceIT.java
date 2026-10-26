@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 import com.example.documentservice.service.DocumentData;
 import com.example.documentservice.service.OrcherstratorService;
@@ -26,9 +25,7 @@ class DocumentResourceIT {
     @Test
     @TestSecurity(user = "alice", roles = {"file-uploader"})
     void uploadDocumentReturnsCreatedStatus() throws Exception {
-        File tempFile = File.createTempFile("invoice", ".pdf");
-        Files.writeString(tempFile.toPath(), "hello world");
-        tempFile.deleteOnExit();
+        File tempFile = new File("src/test/resources/invoice.pdf");
 
         doNothing().when(orchestratorService)
             .createAndUploadDocument(anyString(), any(File.class), anyString(), anyString());
