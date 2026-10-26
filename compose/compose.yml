@@ -89,7 +89,8 @@ services:
       retries: 15
       start_period: 30s
   file-delivery-service:
-    image: filedelivery-api
+    build:
+      context: ../document-service
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/q/health/live"]
       interval: 30s
@@ -133,7 +134,8 @@ services:
       QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_SECRET_ACCESS_KEY: ${S3_SECRET}
       QUARKUS_S3_PATH_STYLE_ACCESS: true
   file-delivery-ui:
-    image: file-delivery-ui:latest
+    build:
+      context: ../UI
     depends_on:
       file-delivery-service:
         condition: service_healthy
