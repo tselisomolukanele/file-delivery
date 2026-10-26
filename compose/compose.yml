@@ -1,5 +1,5 @@
 # The following are externally exposed endpoints
-# The applation UI            8080
+# The applation UI            8443
 # API service                 8081
 # Keycloak                    8082
 # S3                          8083
@@ -50,6 +50,8 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: databasepassword
       POSTGRES_USER: databaseusername
+    ports:
+    - 5433:5432
   keycloak-db:
     image: postgres
     healthcheck:
@@ -150,8 +152,12 @@ services:
         source: config_for_ui
       - target: /etc/nginx/conf.d/default.conf
         source: config_for_nginx
+      - target: /etc/nginx/certs/server.key
+        source: config_for_ssl_key
+      - target: /etc/nginx/certs/server.crt
+        source: config_for_ssl_crt
     ports:
-      - 8080:80
+      - 8443:443
 
 configs:
   config_for_s3:
@@ -162,9 +168,12 @@ configs:
   config_for_nginx:
     content: |
       server {
-          listen       80;
-          listen  [::]:80;
+          listen       443 ssl;
+          listen  [::]:443 ssl;
           server_name  localhost;
+
+          ssl_certificate /etc/nginx/certs/server.crt;
+          ssl_certificate_key /etc/nginx/certs/server.key;
 
           root /usr/share/nginx/html;
           index index.html;
@@ -172,6 +181,7 @@ configs:
           location / {
               root   /usr/share/nginx/html;
               index  index.html index.htm;
+              try_files $$uri $$uri/ /index.html;
           }
 
           location /api/ {
@@ -180,12 +190,16 @@ configs:
               proxy_set_header Host $$host;
               proxy_set_header X-Real-IP $$remote_addr;
               proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $$scheme;
+              proxy_set_header X-Forwarded-Proto https;
           }
       }
   config_for_ui:
     content: |
       {
-          "apiBaseUrl": "http://localhost:8080",
+          "apiBaseUrl": "https://localhost:8443",
           "authBaseUrl": "http://localhost:8082"
       }
+  config_for_ssl_key:
+    file: ./ssl/server.key
+  config_for_ssl_crt:
+    file: ./ssl/server.crt
