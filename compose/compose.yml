@@ -1,23 +1,3 @@
-# The following are externally exposed endpoints
-# The applation UI            8443
-# API service                 8081
-# Keycloak                    8082
-# S3                          8083
-
-# For access to Keycloak as admin
-# username                    security
-# password                    sEcur1ty
-
-# The S3 access details as per S3 setup in mounted volume
-# access key                  test-key
-# access secret               test-secret
-
-# The following are property values that are used by more then one image and need to be consistent
-# Database port               5432
-# Database                    databasepassword
-# Database username           databaseusername
-# Redis port                  6379
-
 services:
   redis:
     image: redis:latest
@@ -48,8 +28,8 @@ services:
     command: -p 5432
     environment:
       POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: databasepassword
-      POSTGRES_USER: databaseusername
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${DATABASE_USER}
     ports:
     - 5433:5432
   keycloak-db:
@@ -63,16 +43,16 @@ services:
     command: -p 5432
     environment:
       POSTGRES_DB: keycloak
-      POSTGRES_PASSWORD: kc-db-password
-      POSTGRES_USER: kc-db-user
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER}
   keycloak:
     image: quay.io/keycloak/keycloak:26.8.0
     depends_on:
       keycloak-db:
           condition: service_healthy
     environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: security
-      KC_BOOTSTRAP_ADMIN_PASSWORD: sEcur1ty
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       KC_HEALTH_ENABLED: true
       KC_METRICS_ENABLED: true
       KC_LOG_CONSOLE_COLOR: true
@@ -82,8 +62,8 @@ services:
       KC_DB_URL_HOST: keycloak-db
       KC_DB_URL_PORT: 5432
       KC_DB_URL_DATABASE: keycloak
-      KC_DB_USERNAME: kc-db-user
-      KC_DB_PASSWORD: kc-db-password
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
       KC_HOSTNAME: localhost
       KC_HOSTNAME_PORT: 8082
       KC_PROXY: edge
@@ -94,21 +74,16 @@ services:
       KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/server.key
     command:
       - start
-      # - --hostname=localhost
-      # - --hostname-port=8082
-      # - --proxy=edge
-      - --http-enabled=false
-      - --https-port=443
-      - --https-certificate-file=/opt/keycloak/conf/server.crt
-      - --https-certificate-key-file=/opt/keycloak/conf/server.key
       - --import-realm
-    volumes:
-      - ./ssl/keycloak.crt:/opt/keycloak/conf/server.crt:ro
-      - ./ssl/keycloak.key:/opt/keycloak/conf/server.key:ro
-      - ./keycloak/file-delivery.json:/opt/keycloak/data/import/file-delivery.json:ro
+    configs:
+      - target: /opt/keycloak/data/import/file-delivery.json
+        source: config_for_keycloak
+      - target: /opt/keycloak/conf/server.crt
+        source: config_for_keycloak_crt
+      - target: /opt/keycloak/conf/server.key
+        source: config_for_keycloak_key
     ports:
       - 8082:443
-      - 9000:9000
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '\"status\": \"UP\"'"]
       interval: 10s
@@ -137,14 +112,14 @@ services:
       KEYCLOAK_PORT: 443
       S3_HOST: "s3"
       S3_PORT: 80
-      S3_ACCESS_KEY_ID: test-key
-      S3_ACCESS_SECRET: test-secret
+      S3_ACCESS_KEY_ID: ${S3_KEY}
+      S3_ACCESS_SECRET: ${S3_SECRET}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       DB_HOST: "database"
       DB_PORT: 5432
-      DB_USERNAME: databaseusername
-      DB_PASSWORD: databasepassword
+      DB_USERNAME: ${DATABASE_USER}
+      DB_PASSWORD: ${DATABASE_PASSWORD}
       # FORCE THESE OVERRIDES AS NATIVE BUILD IMAGE OPTIMIZATIONS DO NOT RESOLVE 
       # APPLICATION PROPRTIES ON RUNTIME 
       QUARKUS_OIDC_AUTH_SERVER_URL: "https://keycloak:443/realms/file-delivery"
@@ -156,8 +131,8 @@ services:
       QUARKUS_S3_ENDPOINT_OVERRIDE: http://s3:80
       QUARKUS_S3_AWS_REGION: us-east-1
       QUARKUS_S3_AWS_CREDENTIALS_TYPE: static
-      QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_ACCESS_KEY_ID: test-key
-      QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_SECRET_ACCESS_KEY: test-secret
+      QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_ACCESS_KEY_ID: ${S3_KEY}
+      QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_SECRET_ACCESS_KEY: ${S3_SECRET}
       QUARKUS_S3_PATH_STYLE_ACCESS: true
     ports:
       - 8081:80
@@ -184,6 +159,10 @@ configs:
       {"objectMap":{},"creationDate":1791780526661,"region":"local","uploads":{},"versioningEnabled":null,"bucketName":"quarkus.s3.file-delivery-bucket","tagging":null,"acl":null,"policy":null,"replication":null,"encryption":null,"publicAccessBlock":null}
   config_for_keycloak:
     file: ./keycloak/file-delivery.json
+  config_for_keycloak_crt:
+    file: ./secrets/keycloak.crt
+  config_for_keycloak_key:
+    file: ./secrets/keycloak.key
   config_for_nginx:
     content: |
       server {
@@ -219,6 +198,6 @@ configs:
           "authBaseUrl": "https://localhost:8082"
       }
   config_for_ui_ssl_key:
-    file: ./ssl/ui.key
+    file: ./secrets/ui.key
   config_for_ui_ssl_crt:
-    file: ./ssl/ui.crt
+    file: ./secrets/ui.crt
