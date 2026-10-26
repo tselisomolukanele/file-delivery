@@ -22,7 +22,7 @@ public class OrcherstratorService {
 
     public void createAndUploadDocument(String customerName, File data, String filename, String mimetype) {
         log.info("Creating and uploading document for customer: {}", customerName);
-        customerService.addDocumentToCustomer(customerName, filename);
+        customerService.addDocumentToCustomer(customerName, filename, data.length());
 
         // Handle logic that cannot be rollbacked last
         documentDataService.uploadFile(new DocumentData(null, data, customerName + "_" + filename, mimetype));

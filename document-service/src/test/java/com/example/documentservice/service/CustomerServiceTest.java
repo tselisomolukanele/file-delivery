@@ -94,7 +94,7 @@ class CustomerServiceTest {
         customer.setName("alice");
         when(customerRepository.findByName("alice")).thenReturn(Optional.of(customer));
 
-        service.addDocumentToCustomer("alice", "invoice.pdf");
+        service.addDocumentToCustomer("alice", "invoice.pdf", 500);
 
         assertEquals(1, customer.getDocuments().size());
         assertEquals("invoice.pdf", customer.getDocuments().get(0).getFilename());
@@ -104,7 +104,7 @@ class CustomerServiceTest {
     void addDocumentToCustomerThrowsWhenCustomerIsMissing() {
         when(customerRepository.findByName("missing")).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> service.addDocumentToCustomer("missing", "invoice.pdf"));
+        assertThrows(NotFoundException.class, () -> service.addDocumentToCustomer("missing", "invoice.pdf", 500));
     }
 
     private void setField(String fieldName, Object value) throws Exception {

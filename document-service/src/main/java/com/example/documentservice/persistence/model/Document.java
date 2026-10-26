@@ -24,14 +24,14 @@ public class Document {
     @Column(nullable = false)
     private String filename;
 
-    @Column(nullable = false)
+    @Column(name = "uploaded_at",nullable = false)
     private LocalDateTime uploadedAt;
 
-    @Column(nullable = false)
+    @Column(name = "uploaded_by",nullable = false)
     private String uploadedBy;
 
-    @Column(nullable = false)
-    private int fileSize;
+    @Column(name = "file_size", nullable = false)
+    private long fileSize;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
@@ -53,11 +53,11 @@ public class Document {
         this.filename = filename;
     }
 
-    public int getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(int fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 

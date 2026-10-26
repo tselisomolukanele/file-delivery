@@ -70,10 +70,11 @@ public class CustomerService {
             .collect(Collectors.toList());
     }
 
-    public void addDocumentToCustomer(String customerName, String filename) {
+    public void addDocumentToCustomer(String customerName, String filename, long filesize) {
 
         var newDocument = new Document();
         newDocument.setFilename(filename);
+        newDocument.setFileSize(filesize);
         newDocument.setUploadedAt(LocalDateTime.now());
         newDocument.setUploadedBy(securityIdentity.getPrincipal().getName());
 

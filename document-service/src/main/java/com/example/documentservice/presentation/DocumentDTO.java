@@ -10,6 +10,6 @@ import lombok.Data;
 public class DocumentDTO {
     private String name;
     private LocalDateTime uploadedAt;
-    private int size;
+    private long size;
     private String link;
 }

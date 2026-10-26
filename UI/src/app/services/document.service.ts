@@ -11,6 +11,8 @@ export interface DocumentProfile {
 
 export interface DocumentItem {
   name: string;
+  size: number;
+  uploadedAt: Date;
   link: string;
 }
 

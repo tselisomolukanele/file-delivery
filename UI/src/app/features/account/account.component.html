@@ -17,6 +17,8 @@
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Size</th>
+                <th>Date Uploaded</th>
                 <th>Download</th>
                 <th>Email</th>
               </tr>
@@ -24,6 +26,8 @@
             <tbody>
               <tr *ngFor="let document of documents()">
                 <td>{{ document.name }}</td>
+                <td>{{ format(document.size) }}</td>
+                <td>{{ document.uploadedAt | date: "yyyy MMM dd" }}</td>
                 <td><a href="{{ document.link }}" target="_blank">Download</a></td>
                 <td><button (click)="goToLink(document)">Email</button></td>
               </tr>

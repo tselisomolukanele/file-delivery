@@ -44,7 +44,7 @@ class OrcherstratorServiceTest {
                 && "application/pdf".equals(documentData.getMimetype())
                 && documentData.getFile() == file
         ));
-        verify(customerService).addDocumentToCustomer("alice", "invoice.pdf");
+        verify(customerService).addDocumentToCustomer("alice", "invoice.pdf", 0);
     }
 
     @Test
