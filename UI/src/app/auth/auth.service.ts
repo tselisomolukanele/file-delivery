@@ -29,7 +29,7 @@ export class AuthService {
   readonly users: AppUser[] = [];
   readonly user = signal<AppUser | null>(this.readStoredUser());
   readonly accessToken = signal<string | null>(this.readStoredToken());
-  readonly isAuthenticated = computed(() => !!this.user());
+  readonly isAuthenticated = computed(() => !!this.user() || !!this.getAccessToken());
 
   async init(): Promise<void> {
     try {
@@ -62,13 +62,57 @@ export class AuthService {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
+  isTokenExpired(): boolean {
+    const exp = this.keycloak.tokenParsed?.exp;
+    if (typeof exp !== 'number') {
+      return false;
+    }
+
+    return Date.now() >= exp * 1000;
+  }
+
+  async refreshSessionIfNeeded(): Promise<boolean> {
+    const token = this.getAccessToken();
+    if (!token) {
+      return false;
+    }
+
+    const expiresAt = this.keycloak.tokenParsed?.exp;
+    const refreshWindow = 60;
+    const hasFreshToken = typeof expiresAt === 'number' && expiresAt * 1000 > Date.now() + refreshWindow * 1000;
+
+    if (hasFreshToken) {
+      return true;
+    }
+
+    try {
+      const refreshed = await this.keycloak.updateToken(refreshWindow);
+      if (refreshed) {
+        this.syncFromKeycloak();
+      }
+      return refreshed;
+    } catch (error) {
+      console.error('Unable to refresh the Keycloak session', error);
+      this.clearSession();
+      return false;
+    }
+  }
+
+  async redirectToLogin(message = 'Your session expired. Please sign in again.') {
+    this.clearSession();
+    sessionStorage.setItem('file-delivery.session-message', message);
+    await this.keycloak.login({
+      redirectUri: `${window.location.origin}/`,
+      prompt: 'login',
+      scope: 'openid profile email',
+    });
+  }
+
   async logout(): Promise<void> {
     try {
       await this.keycloak.logout({ redirectUri: `${window.location.origin}/` });
     } finally {
-      sessionStorage.removeItem(this.storageKey);
-      this.clearStoredToken();
-      this.user.set(null);
+      this.clearSession();
     }
   }
 
@@ -127,6 +171,12 @@ export class AuthService {
   private clearStoredToken(): void {
     this.accessToken.set(null);
     sessionStorage.removeItem(JWT_STORAGE_KEY);
+  }
+
+  private clearSession(): void {
+    sessionStorage.removeItem(this.storageKey);
+    this.clearStoredToken();
+    this.user.set(null);
   }
 
   private readStoredToken(): string | null {
