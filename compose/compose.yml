@@ -21,24 +21,67 @@
 services:
   redis:
     image: redis:latest
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
     command: --port 6379
   s3:
    image: luofuxiang/local-s3
+   healthcheck:
+      test: bash -c "[ -f /data/version ]"
+      interval: 5s
+      timeout: 10s
+      start_period: 10s
    configs:
      - target: /data/quarkus.s3.file-delivery-bucket.bucket.meta
        source: config_for_s3
   database:
     image: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
     command: -p 5432
     environment:
+      POSTGRES_DB: postgres
       POSTGRES_PASSWORD: databasepassword
       POSTGRES_USER: databaseusername
+  keycloak-db:
+    image: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    command: -p 5432
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_PASSWORD: kc-db-password
+      POSTGRES_USER: kc-db-user
   keycloak:
     image: quay.io/keycloak/keycloak:26.8.0
+    depends_on:
+      keycloak-db:
+          condition: service_healthy
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: security
       KC_BOOTSTRAP_ADMIN_PASSWORD: sEcur1ty
       KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+      KC_LOG_CONSOLE_COLOR: true
+      KC_LOG_LEVEL: INFO
+      KC_HTTP_ACCESS_LOG_ENABLED: true
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: kc-db-user
+      KC_DB_PASSWORD: kc-db-password
     command: -v start-dev --import-realm
     configs:
       - target: /opt/keycloak/data/import/file-delivery.json
@@ -53,15 +96,20 @@ services:
       start_period: 30s
   file-delivery-service:
     image: filedelivery-api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/q/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     depends_on:
       keycloak:
-          condition: service_healthy
+        condition: service_healthy
       redis: 
-        condition: service_started
+        condition: service_healthy
       database: 
-        condition: service_started
+        condition: service_healthy
       s3: 
-        condition: service_started
+        condition: service_healthy
     environment:
       FILE_DILEVERY_SERVER_HOST: "localhost"
       FILE_DILEVERY_SERVER_PORT: 8080
@@ -90,12 +138,13 @@ services:
       QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_ACCESS_KEY_ID: test-key
       QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_SECRET_ACCESS_KEY: test-secret
       QUARKUS_S3_PATH_STYLE_ACCESS: true
+    ports:
+      - 8081:80
   file-delivery-ui:
-    build:
-      context: ../UI
     image: file-delivery-ui:latest
     depends_on:
-      - file-delivery-service
+      file-delivery-service:
+        condition: service_healthy
     configs:
       - target: /usr/share/nginx/html/config.json
         source: config_for_ui
