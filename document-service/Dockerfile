@@ -1,5 +1,5 @@
-# Stage 1: Build the native executable
-FROM quay.io/quarkus/ubi-quarkus-mandrel-builder-image:23.1-java17 AS build
+# Stage 1: Build the application using Java 21 Mandrel Builder
+FROM quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 AS build
 COPY --chown=quarkus:quarkus mvnw /project/mvnw
 COPY --chown=quarkus:quarkus .mvn /project/.mvn
 COPY --chown=quarkus:quarkus pom.xml /project/
@@ -8,18 +8,19 @@ WORKDIR /project
 RUN ./mvnw dependency:go-offline
 
 COPY --chown=quarkus:quarkus src /project/src
-RUN ./mvnw -B -DskipTests package -Dnative -Dquarkus.native.container-build=true
+# standard JVM package build step
+RUN ./mvnw -B -DskipTests package 
 
-# Stage 2: Create the minimal execution image
+# Stage 2: Create the execution image with OpenJDK 21
 FROM registry.access.redhat.com/ubi9/openjdk-21-runtime:1.24
 
 ENV LANGUAGE='en_US:en'
 
-# We make four distinct layers so if there are application changes the library layers can be re-used
-COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
-COPY --chown=185 target/quarkus-app/*.jar /deployments/
-COPY --chown=185 target/quarkus-app/app/ /deployments/app/
-COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
+# Copies compiled source segments securely from Stage 1
+COPY --from=build --chown=185 /project/target/quarkus-app/lib/ /deployments/lib/
+COPY --from=build --chown=185 /project/target/quarkus-app/*.jar /deployments/
+COPY --from=build --chown=185 /project/target/quarkus-app/app/ /deployments/app/
+COPY --from=build --chown=185 /project/target/quarkus-app/quarkus/ /deployments/quarkus/
 
 EXPOSE 8080
 USER 185
