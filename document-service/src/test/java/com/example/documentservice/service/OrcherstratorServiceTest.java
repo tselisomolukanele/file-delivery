@@ -59,12 +59,13 @@ class OrcherstratorServiceTest {
         linkEntry.setOwnerId("alice");
         linkEntry.setDocumentId(42L);
 
-        DocumentData expected = new DocumentData(
-            new byte[]{1, 2, 3},
-            null,
-            "alice_invoice.pdf",
-            "application/pdf"
-        );
+        DocumentData expected =
+            DocumentData
+            .builder()
+            .data(new byte[]{1, 2, 3})
+            .filename("alice_invoice.pdf")
+            .mimetype("application/pdf")
+            .build();            
 
         when(documentLinkService.getDocumentLink("token-1")).thenReturn(linkEntry);
         when(documentDataService.downloadFile("alice", 42L)).thenReturn(expected);

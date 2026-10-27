@@ -2,14 +2,15 @@ package com.example.documentservice.service;
 
 import java.io.File;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
-@Data
-@AllArgsConstructor 
+@Data 
+@Builder 
 public class DocumentData {
     private byte[] data;
     private File file;
     private String filename;
     private String mimetype;
+    private String owner;
 }

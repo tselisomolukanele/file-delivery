@@ -50,6 +50,14 @@ public class CustomerResource {
         return customerService.getCustomerDocuments();
     }
 
+    @GET    
+    @Path("/current/otp")
+    @Produces(MediaType.TEXT_PLAIN)
+    @RolesAllowed({"file-owner"})
+    public String otp() {
+        return customerService.getOTP();
+    }
+
     @ServerExceptionMapper
     public Response mapException(ClientErrorException exception) {
         return

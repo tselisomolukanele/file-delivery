@@ -92,12 +92,13 @@ class DocumentDataServiceTest {
         File tempFile = File.createTempFile("upload-test", ".txt");
         tempFile.deleteOnExit();
 
-        DocumentData documentData = new DocumentData(
-            "payload".getBytes(StandardCharsets.UTF_8),
-            tempFile,
-            "upload.txt",
-            "text/plain"
-        );
+        DocumentData documentData = DocumentData
+            .builder()
+            .data("payload".getBytes(StandardCharsets.UTF_8))
+            .file(tempFile)
+            .filename("upload.txt")
+            .mimetype("text/plain")
+            .build();
 
         when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
             .thenReturn(PutObjectResponse.builder().build());

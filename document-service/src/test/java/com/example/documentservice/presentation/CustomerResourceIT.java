@@ -53,7 +53,6 @@ class CustomerResourceIT {
     void getCurrentCustomerDocumentsReturnsDocumentList() {
         DocumentDTO document = DocumentDTO.builder()
             .name("invoice.pdf")
-            .link("https://example.com/download/abc")
             .uploadedAt(LocalDateTime.of(2026, 10, 25, 12, 0))
             .size(42)
             .build();
@@ -65,7 +64,6 @@ class CustomerResourceIT {
             .get("/api/customers/current/documents")
             .then()
             .statusCode(200)
-            .body("[0].name", equalTo("invoice.pdf"))
-            .body("[0].link", equalTo("https://example.com/download/abc"));
+            .body("[0].name", equalTo("invoice.pdf"));
     }
 }

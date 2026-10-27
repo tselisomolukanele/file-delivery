@@ -10,6 +10,7 @@
     <div class="profile-body">
       <h2>{{ currentUser.name }}</h2>
       <p class="muted">{{ currentUser.email }}</p>
+      <button (click)="getOTP()">Generate OTP</button>
 
       <dl>
         <div>
@@ -18,7 +19,7 @@
               <tr>
                 <th>Name</th>
                 <th>Size</th>
-                <th>Date Uploaded</th>
+                <th>Uploaded</th>
                 <th>Download</th>
                 <th>Email</th>
               </tr>
@@ -28,7 +29,7 @@
                 <td>{{ document.name }}</td>
                 <td>{{ format(document.size) }}</td>
                 <td>{{ document.uploadedAt | date: "yyyy MMM dd" }}</td>
-                <td><a href="{{ document.link }}" target="_blank">Download</a></td>
+                <td><a href=" document.link " target="_blank">Download</a></td>
                 <td><button (click)="goToLink(document)">Email</button></td>
               </tr>
             </tbody>

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
+import com.example.documentservice.service.CustomerService;
 import com.example.documentservice.service.DocumentData;
 import com.example.documentservice.service.OrcherstratorService;
 import io.quarkus.test.InjectMock;
@@ -21,6 +22,9 @@ class DocumentResourceIT {
 
     @InjectMock
     OrcherstratorService orchestratorService;
+
+    @InjectMock
+    CustomerService customerService;
 
     @Test
     @TestSecurity(user = "alice", roles = {"file-uploader"})
@@ -56,12 +60,21 @@ class DocumentResourceIT {
 
     @Test
     void downloadDocumentReturnsFileContents() {
-        DocumentData documentData = new DocumentData("hello".getBytes(), null, "invoice.pdf", "application/pdf");
+        DocumentData documentData = 
+            DocumentData
+            .builder()
+            .data("hello".getBytes())
+            .filename("invoice.pdf")
+            .mimetype("application/pdf")
+            .owner("person")
+            .build();
+
         when(orchestratorService.getDocumentData("token-123")).thenReturn(documentData);
+        when(customerService.validateOTP("2345", "person")).thenReturn(true);
 
         given()
             .when()
-            .get("/api/document/download/token-123")
+            .get("/api/document/download/token-123?otp=2345")
             .then()
             .statusCode(200)
             .header("Content-Type", "application/pdf")

@@ -13,7 +13,7 @@ export interface DocumentItem {
   name: string;
   size: number;
   uploadedAt: Date;
-  link: string;
+  id: number;
 }
 
 @Injectable({ providedIn: 'root' })

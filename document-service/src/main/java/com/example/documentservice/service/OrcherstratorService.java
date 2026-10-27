@@ -27,7 +27,15 @@ public class OrcherstratorService {
         Document addedDocument = customerService.addDocumentToCustomer(customerName, data, filename);
 
         // Handle logic that cannot be rollbacked last
-        documentDataService.uploadFile(new DocumentData(null, data, customerName + "_" + addedDocument.getChecksum(), mimetype));
+        documentDataService.uploadFile(
+            DocumentData
+                .builder()
+                .file(data)
+                .filename(customerName + "_" + addedDocument.getChecksum())
+                .mimetype(mimetype)
+                .owner(customerName)
+                .build()
+        );
     }
 
     public DocumentData getDocumentData(String objectKey) {

@@ -9,11 +9,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "customers")
+@Setter
+@Getter 
+@NoArgsConstructor 
 public class Customer extends PanacheEntityBase {
 
     @Id
@@ -25,22 +32,6 @@ public class Customer extends PanacheEntityBase {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Document> documents = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<Document> getDocuments() {
-        return documents;
-    }
 
     public void setDocuments(List<Document> documents) {
         this.documents = documents;

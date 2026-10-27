@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.example.documentservice.persistence.model.Customer;
@@ -19,6 +20,8 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
+import io.quarkus.redis.datasource.RedisDataSource;
+import io.quarkus.redis.datasource.value.ValueCommands;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -44,6 +47,15 @@ public class CustomerService {
     @Inject
     DocumentRepository documentRepository;
 
+    @Inject 
+    RedisDataSource ds;
+
+    private final ValueCommands<String,OTPLinkEntry> valueCommands;
+
+    public CustomerService(RedisDataSource ds) { 
+        valueCommands = ds.value(OTPLinkEntry.class);
+    }
+
     public List<CustomerDTO> getAllCustomers() {
 
         return customerRepository
@@ -60,9 +72,9 @@ public class CustomerService {
 
     public List<DocumentDTO> getCustomerDocuments() {
 
-        log.info("Fetching documents for customer: {}", securityIdentity.getPrincipal().getName());
-
         var customerName = securityIdentity.getPrincipal().getName();
+        log.info("Fetching documents for customer: {}", customerName);
+
         return customerRepository.findByName(customerName)
             .orElseThrow(() -> new NotFoundException("Customer not found"))
             .getDocuments()
@@ -73,10 +85,7 @@ public class CustomerService {
                     .name(documentEntity.getFilename())
                     .size(documentEntity.getFileSize())
                     .uploadedAt(documentEntity.getUploadedAt())
-                    .link(
-                        documentLinkService.createDocumentLink(documentEntity.getId(), 
-                        securityIdentity.getPrincipal().getName()).getLink()
-                    )
+                    .id(documentEntity.getId())
                     .build()
             )
             .collect(Collectors.toList());
@@ -128,5 +137,38 @@ public class CustomerService {
                 .name(customerEntity.getName())
                 .build()
         ).orElseThrow(() -> new NotFoundException("Customer not found after creation"));
+    }
+
+    public String getOTP() {
+        var username = securityIdentity.getPrincipal().getName();
+        Random random = new Random();
+        var otp = String.format("%04d", random.nextInt(10000));
+        
+        valueCommands.set(
+            username, 
+            OTPLinkEntry.builder().otp(otp).ownerId(username).build()
+        );
+
+        return otp;
+    }
+
+    public boolean validateOTP(String otp, String username) {
+        log.info("owner: " + username);
+        var entry = valueCommands.get(username);
+
+        if (entry == null) {
+            log.error("no entry");
+            return false;
+        }
+
+        if (!entry.getOwnerId().equals(username) || !entry.getOtp().equals(otp)) {
+
+            log.error("no match: " + entry.getOwnerId() + " != " + username + ", " 
+            + entry.getOtp() + " != " + otp);
+            return false;
+        }
+
+        valueCommands.getdel(username);
+        return true;
     }
 }

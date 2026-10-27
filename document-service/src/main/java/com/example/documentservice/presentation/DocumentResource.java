@@ -1,13 +1,15 @@
 package com.example.documentservice.presentation;
 
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response.Status;
+import lombok.extern.slf4j.Slf4j;
+import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.MediaType;
 
 import jakarta.inject.Inject;
@@ -15,21 +17,63 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.tika.Tika;
-import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import com.example.documentservice.service.CustomerService;
 import com.example.documentservice.service.OrcherstratorService;
 
 @Path("/api/document")
+@Slf4j
 public class DocumentResource {
 
     @Inject 
     OrcherstratorService orchestrator;
 
+    @Inject 
+    CustomerService customerService;
+
+    @ConfigProperty(name = "document.link.base.url")
+    String baseUrl;
+
     @GET
     @Path("/download/{objectKey}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response downloadFile(String objectKey) {
+    public Response downloadFile(String objectKey, @QueryParam("otp") String otp) {
+
+        if (otp == null || otp.isBlank()) {
+            return Response
+                .seeOther(
+                    UriBuilder
+                    .fromUri(baseUrl + "/confirm-otp.html")
+                    .queryParam(
+                        "downloadUrl",
+                        UriBuilder.fromUri(baseUrl + "/api/document/download/" + objectKey)
+                        .build() 
+                    )   
+                    .build()
+                )
+                .build();
+        }
 
         var documentData = orchestrator.getDocumentData(objectKey);
+
+        if (!customerService.validateOTP(otp, documentData.getOwner())) {
+            log.error("OTP is not valid: " + otp + ", customer: " + documentData.getOwner());
+
+            return Response
+                .seeOther(
+                    UriBuilder
+                    .fromUri(baseUrl + "/confirm-otp.html")
+                    .queryParam(
+                        "downloadUrl",
+                        UriBuilder.fromUri(baseUrl + "/api/document/download/" + objectKey)
+                        .build()
+                    )
+                    .queryParam("error", "Provide OTP is not valid")
+                    .build()
+                )
+                .build();
+        }
 
         ResponseBuilder response = Response.ok(documentData.getData());
         response.header("Content-Disposition", "attachment;filename=" + documentData.getFilename());
@@ -78,15 +122,5 @@ public class DocumentResource {
         );
 
         return Response.ok().status(Status.CREATED).build();
-    }
-
-    @ServerExceptionMapper
-    public Response mapException(ClientErrorException exception) {
-        return
-            Response
-                .status(exception.getResponse().getStatus())
-                .entity(exception.getMessage())
-                .type(MediaType.TEXT_PLAIN)
-                .build();
     }
 }

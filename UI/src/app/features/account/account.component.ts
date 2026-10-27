@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { sizeFormatter } from 'human-readable'
+import { ToastrService } from 'ngx-toastr';
 
 import { AuthService } from '../../auth/auth.service';
 import { DocumentItem } from '../../services/document.service';
@@ -16,6 +17,7 @@ import { CustomerService } from '../../services/cutomer.service';
 })
 export class AccountComponent implements OnInit {
   readonly auth = inject(AuthService);
+  readonly toastr = inject(ToastrService);
   readonly customerService = inject(CustomerService);
   readonly user = this.auth.user;
   readonly documents = signal<DocumentItem[]>([]);
@@ -28,9 +30,18 @@ export class AccountComponent implements OnInit {
   }
 
   goToLink(document: DocumentItem) {
-    localStorage.setItem('filename', document.name);
-    localStorage.setItem('link', document.link);
-    window.open("/email-message.html", "_blank");
+    window.open(`/email-message.html?documentId=${document.id}&username=${this.user()?.username}`, "_blank");
+  }
+
+  getOTP() {
+    this.customerService.getOTP().subscribe({
+      next: (otp) => 
+        this.toastr.info(otp, `OTP`, {
+          timeOut: 5000,
+          closeButton: true,
+          progressBar: true,
+        })
+    });
   }
 
   format = sizeFormatter({

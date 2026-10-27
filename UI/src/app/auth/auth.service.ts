@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 
 export interface AppUser {
   id: number;
+  username: string;
   name: string;
   email: string;
   roles: string[];
@@ -135,9 +136,11 @@ export class AuthService {
     const name = [givenName, familyName].filter(Boolean).join(' ') || (typeof claims['preferred_username'] === 'string' ? claims['preferred_username'] : 'Keycloak User');
     const email = typeof claims['email'] === 'string' ? claims['email'] : `${name}@localhost`;
     const token = this.keycloak.token;
+    const username = typeof claims['preferred_username'] === 'string' ? claims['preferred_username'] : '';
 
     const user: AppUser = {
       id: Number(this.keycloak.subject ?? Date.now()),
+      username,
       name,
       email,
       roles,

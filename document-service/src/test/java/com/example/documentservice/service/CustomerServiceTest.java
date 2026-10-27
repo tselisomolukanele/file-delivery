@@ -19,6 +19,7 @@ import com.example.documentservice.persistence.repository.DocumentRepository;
 import com.example.documentservice.presentation.CustomerDTO;
 import com.example.documentservice.presentation.DocumentDTO;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.redis.datasource.RedisDataSource;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
@@ -30,20 +31,19 @@ class CustomerServiceTest {
     private CustomerService service;
     private CustomerRepository customerRepository;
     private DocumentRepository documentRepository;
-    private DocumentLinkService documentLinkService;
     private SecurityIdentity securityIdentity;
+    private RedisDataSource redisDataSource;
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new CustomerService();
+        redisDataSource = mock(RedisDataSource.class);
+        service = new CustomerService(redisDataSource);
         customerRepository = mock(CustomerRepository.class);
         documentRepository = mock(DocumentRepository.class);
-        documentLinkService = mock(DocumentLinkService.class);
         securityIdentity = mock(SecurityIdentity.class);
 
         setField("customerRepository", customerRepository);
         setField("documentRepository", documentRepository);
-        setField("documentLinkService", documentLinkService);
         setField("securityIdentity", securityIdentity);
 
         Principal principal = () -> "alice";
@@ -65,7 +65,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    void getCustomerDocumentsReturnsDocumentListWithLinks() throws Exception {
+    void getCustomerDocumentsReturnsDocumentList() throws Exception {
         Customer customer = new Customer();
         Document document = new Document();
         setDocumentId(document, 42L);
@@ -73,14 +73,12 @@ class CustomerServiceTest {
         customer.addDocument(document);
 
         when(customerRepository.findByName("alice")).thenReturn(Optional.of(customer));
-        when(documentLinkService.createDocumentLink(42L, "alice"))
-            .thenReturn(newDocumentLink("https://example.com/download/abc-123"));
 
         List<DocumentDTO> results = service.getCustomerDocuments();
 
         assertEquals(1, results.size());
         assertEquals("invoice.pdf", results.get(0).getName());
-        assertEquals("https://example.com/download/abc-123", results.get(0).getLink());
+        assertEquals(42L, results.get(0).getId());
     }
 
     @Test
@@ -135,12 +133,5 @@ class CustomerServiceTest {
         field.set(document, id);
     }
 
-    private DocumentLinkEntry newDocumentLink(String link) {
-        DocumentLinkEntry entry = new DocumentLinkEntry();
-        entry.setId("abc-123");
-        entry.setDocumentId(42L);
-        entry.setOwnerId("alice");
-        entry.setLink(link);
-        return entry;
-    }
+
 }

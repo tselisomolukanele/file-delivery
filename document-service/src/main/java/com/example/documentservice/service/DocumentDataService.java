@@ -1,5 +1,7 @@
 package com.example.documentservice.service;
 
+import java.util.Map;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import com.example.documentservice.persistence.model.Document;
@@ -31,6 +33,9 @@ public class DocumentDataService {
     @Inject
     DocumentRepository documentRepository;
 
+    @Inject
+    DocumentLinkService documentLinkService;
+
     public DocumentData downloadFile(String owner, long documentId) {
 
         Document found = documentRepository.findById(documentId);
@@ -44,7 +49,13 @@ public class DocumentDataService {
             throw new NotFoundException("The file is empty on S3.");
         }
 
-        return new DocumentData(data, null, found.getFilename(), objectBytes.response().contentType());
+        return DocumentData
+                .builder()
+                .data(data)
+                .filename(found.getFilename())
+                .mimetype(objectBytes.response().contentType())
+                .owner(owner)
+                .build();
     }
 
     public void uploadFile(DocumentData documentData) {
@@ -59,6 +70,22 @@ public class DocumentDataService {
             Log.error("Failed to upload the file to S3.", e);
             throw new InternalServerErrorException("Failed to upload the file to S3.", e);
         }
+    }
+
+    public Map<String, String> getDocumentLink( long documentId, String username) {
+        Document document = documentRepository.findByIdAndCustomerName(documentId, username)
+        .orElseThrow(() -> new NotFoundException("No document found for the given inputs"));
+
+        var link = documentLinkService
+            .createDocumentLink(
+                document.getId(), 
+                document.getCustomer().getName())
+            .getLink();
+
+        return Map.of(
+                "filename", document.getFilename(),
+                "link", link
+            );
     }
 
     private PutObjectRequest buildPutRequest(DocumentData documentData) {

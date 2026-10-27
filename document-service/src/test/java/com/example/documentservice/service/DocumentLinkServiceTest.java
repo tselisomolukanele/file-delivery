@@ -60,7 +60,7 @@ class DocumentLinkServiceTest {
         expected.setOwnerId("alice");
         expected.setLink("https://example.com/document/download/abc-123");
 
-        when(valueCommands.getdel("abc-123")).thenReturn(expected);
+        when(valueCommands.get("abc-123")).thenReturn(expected);
 
         DocumentLinkEntry result = service.getDocumentLink("abc-123");
 

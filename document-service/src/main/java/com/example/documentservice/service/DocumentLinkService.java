@@ -50,7 +50,7 @@ public class DocumentLinkService {
 
     public DocumentLinkEntry getDocumentLink(String objectKey) {
         
-        var documentLinkEntry = valueCommands.getdel(objectKey);
+        var documentLinkEntry = valueCommands.get(objectKey);
 
         if (documentLinkEntry == null) {
             throw new NotFoundException("Document link not found for key: " + objectKey);

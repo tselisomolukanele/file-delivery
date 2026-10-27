@@ -30,6 +30,12 @@ export class CustomerService {
     });
   }
 
+  getOTP(): Observable<string> {
+    return this.http.get<string>(`${this.baseUrl}/api/customers/current/otp`, {
+      headers: this.buildHeaders(),
+    });
+  }
+
   private buildHeaders(): HttpHeaders {
     const authHeader = this.auth.getAuthorizationHeader();
     return new HttpHeaders(authHeader);

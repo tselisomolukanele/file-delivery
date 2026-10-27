@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm OTP</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f7fb;
+        --panel: #ffffff;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #dfe3ea;
+        --shadow: rgba(15, 23, 42, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .card {
+        width: min(92vw, 420px);
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: 0 12px 32px var(--shadow);
+        padding: 2rem 1.5rem;
+      }
+
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: 1.7rem;
+      }
+
+      p {
+        margin: 0 0 1.25rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.8rem 0.9rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 1rem;
+      }
+
+      input:focus {
+        outline: 2px solid rgba(37, 99, 235, 0.2);
+        border-color: var(--primary);
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        background: var(--primary);
+        color: white;
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      button:hover {
+        background: var(--primary-dark);
+      }
+
+      .status {
+        min-height: 1.25rem;
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Confirm OTP</h1>
+      <p>Please enter the one-time password to continue with your download.</p>
+      <p id="errorP" style="color: brown;"></p>
+
+      <form id="otp-form">
+        <label for="otp">OTP</label>
+        <input
+          id="otp"
+          name="otp"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          placeholder="Enter your OTP"
+          required
+        />
+        <button type="submit">Request Download</button>
+      </form>
+
+      <div id="status" class="status" aria-live="polite"></div>
+    </main>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const downloadUrl = urlParams.get('downloadUrl') || '/';
+      const error = urlParams.get('error');
+      const form = document.getElementById('otp-form');
+      const otpInput = document.getElementById('otp');
+      const status = document.getElementById('status');
+
+      if (error) {
+        document.getElementById('errorP').innerText = error;
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const otpValue = otpInput.value.trim();
+        if (!otpValue) {
+          status.textContent = 'Please enter an OTP.';
+          status.style.color = '#b91c1c';
+          otpInput.focus();
+          return;
+        }
+
+        status.textContent = 'Requesting download...';
+        status.style.color = '#374151';
+
+        const nextUrl = new URL(downloadUrl, window.location.origin);
+        nextUrl.searchParams.set('otp', otpValue);
+
+        console.log("going to: " + nextUrl.toString())
+        window.location.href = nextUrl.toString();
+      });
+    </script>
+  </body>
+</html>

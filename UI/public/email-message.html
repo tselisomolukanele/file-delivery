@@ -371,10 +371,33 @@
   </head>
   <body>
     <script>
-        window.onload = function() {
-            
-            document.getElementById('filename').innerText = localStorage.getItem('filename');
-            document.getElementById("downloadbutton").onclick = () => location.href=localStorage.getItem('link');
+      function getURLParameter(sParam) {
+            var sPageURL = window.location.search.substring(1);
+            var sURLVariables = sPageURL.split('&');
+            for (var i = 0; i < sURLVariables.length; i++) {
+                var sParameterName = sURLVariables[i].split('=');
+                if (sParameterName[0] == sParam) {
+                    return sParameterName[1];
+                }
+            }
+        }
+        window.onload = function() {          
+          var documentId = getURLParameter('documentId');
+          var username = getURLParameter('username');
+
+          window.fetch(`api/email/document-link?documentId=${documentId}&username=${username}`)
+          .then(response => {
+            if (response.ok) {
+              response.json()
+              .then(responseBody => {
+                console.log(responseBody)
+                document.getElementById('filename').innerText = responseBody.filename;
+                document.getElementById("downloadbutton").onclick = () => location.href=responseBody.link;
+              })
+            } else {
+              alert("Something went wrong fetching documents")
+            }
+          })
         };
     </script>
     <div class="mail-shell">

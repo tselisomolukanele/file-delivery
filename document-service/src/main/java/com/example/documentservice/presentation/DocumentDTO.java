@@ -11,5 +11,5 @@ public class DocumentDTO {
     private String name;
     private LocalDateTime uploadedAt;
     private long size;
-    private String link;
+    private long id;
 }
