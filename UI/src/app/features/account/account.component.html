@@ -29,7 +29,7 @@
                 <td>{{ document.name }}</td>
                 <td>{{ format(document.size) }}</td>
                 <td>{{ document.uploadedAt | date: "yyyy MMM dd" }}</td>
-                <td><a href=" document.link " target="_blank">Download</a></td>
+                <td><button (click)="download(document.id, document.name)">Download</button></td>
                 <td><button (click)="goToLink(document)">Email</button></td>
               </tr>
             </tbody>

@@ -30,6 +30,13 @@ export class CustomerService {
     });
   }
 
+  download(documentId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/api/customers/current/document/download/${documentId}`, { 
+      headers: this.buildHeaders(),
+      responseType: 'blob' 
+    });
+  }
+
   getOTP(): Observable<string> {
     return this.http.get<string>(`${this.baseUrl}/api/customers/current/otp`, {
       headers: this.buildHeaders(),

@@ -58,8 +58,6 @@ public class DocumentResource {
         var documentData = orchestrator.getDocumentData(objectKey);
 
         if (!customerService.validateOTP(otp, documentData.getOwner())) {
-            log.error("OTP is not valid: " + otp + ", customer: " + documentData.getOwner());
-
             return Response
                 .seeOther(
                     UriBuilder

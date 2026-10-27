@@ -33,6 +33,30 @@ export class AccountComponent implements OnInit {
     window.open(`/email-message.html?documentId=${document.id}&username=${this.user()?.username}`, "_blank");
   }
 
+  download(documentId: number, fileName: string) {
+    this.customerService.download(documentId)
+    .subscribe({
+      next: (blob: Blob) => {
+        // Create a local URL pointing to the binary Blob object
+        const objectUrl = window.URL.createObjectURL(blob);
+        
+        // Setup an invisible anchor element to trigger the download
+        const anchor = document.createElement('a');
+        anchor.href = objectUrl;
+        anchor.download = fileName;
+        
+        // Programmatically trigger a click event to launch the browser's download
+        anchor.click();
+        
+        // Clean up memory allocations by revoking the local URL object
+        window.URL.revokeObjectURL(objectUrl);
+      },
+      error: (error) => {
+        console.error('File download failed:', error);
+      }
+    });
+  }
+
   getOTP() {
     this.customerService.getOTP().subscribe({
       next: (otp) => 

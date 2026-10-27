@@ -5,7 +5,9 @@ import java.util.List;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
 import com.example.documentservice.service.CustomerService;
+import com.example.documentservice.service.DocumentDataService;
 
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -16,6 +18,7 @@ import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 @Path("/api/customers")
@@ -24,7 +27,13 @@ public class CustomerResource {
 
     @Inject 
     CustomerService customerService;
+
+    @Inject 
+    DocumentDataService documentDataService;
     
+    @Inject
+    private SecurityIdentity securityIdentity;
+
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -56,6 +65,21 @@ public class CustomerResource {
     @RolesAllowed({"file-owner"})
     public String otp() {
         return customerService.getOTP();
+    }
+
+    @GET
+    @Path("/current/document/download/{documentId}")
+    @RolesAllowed({"file-owner"})
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response downloadFile(long documentId) {
+
+        var customerName = securityIdentity.getPrincipal().getName();
+        var documentData = documentDataService.downloadFile(customerName, documentId);
+
+        ResponseBuilder response = Response.ok(documentData.getData());
+        response.header("Content-Disposition", "attachment;filename=" + documentData.getFilename());
+        response.header("Content-Type", documentData.getMimetype());
+        return response.build();
     }
 
     @ServerExceptionMapper

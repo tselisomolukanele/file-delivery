@@ -153,18 +153,24 @@ public class CustomerService {
     }
 
     public boolean validateOTP(String otp, String username) {
-        log.info("owner: " + username);
         var entry = valueCommands.get(username);
 
         if (entry == null) {
-            log.error("no entry");
+            log.error(
+                "OTP has no entry: {}  {}", 
+                username,
+                otp);
             return false;
         }
 
         if (!entry.getOwnerId().equals(username) || !entry.getOtp().equals(otp)) {
 
-            log.error("no match: " + entry.getOwnerId() + " != " + username + ", " 
-            + entry.getOtp() + " != " + otp);
+            log.error(
+                "OTP has no match: {} != {}, {} != {}", 
+                entry.getOwnerId(), 
+                username, 
+                entry.getOtp(),
+                otp);
             return false;
         }
 
