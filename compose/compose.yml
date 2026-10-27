@@ -171,6 +171,8 @@ configs:
           ssl_certificate /etc/nginx/certs/server.crt;
           ssl_certificate_key /etc/nginx/certs/server.key;
 
+          client_max_body_size 50m;
+
           root /usr/share/nginx/html;
           index index.html;
 
