@@ -33,6 +33,9 @@ public class Document {
     @Column(name = "file_size", nullable = false)
     private long fileSize;
 
+    @Column(name = "checksum", nullable = false, unique = true)
+    private String checksum;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     @JsonIgnore
@@ -83,5 +86,13 @@ public class Document {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
+    }
+
+    public String getChecksum() {
+        return checksum;
     }
 }

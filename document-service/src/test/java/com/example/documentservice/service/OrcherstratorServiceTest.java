@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.lang.reflect.Field;
 
+import com.example.documentservice.persistence.model.Document;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,21 +39,25 @@ class OrcherstratorServiceTest {
         File file = File.createTempFile("upload", ".pdf");
         file.deleteOnExit();
 
+        Document createdDocument = new Document();
+        createdDocument.setChecksum("checksum-123");
+        when(customerService.addDocumentToCustomer("alice", file, "invoice.pdf")).thenReturn(createdDocument);
+
         service.createAndUploadDocument("alice", file, "invoice.pdf", "application/pdf");
 
         verify(documentDataService).uploadFile(argThat(documentData ->
-            "alice_invoice.pdf".equals(documentData.getFilename())
+            "alice_checksum-123".equals(documentData.getFilename())
                 && "application/pdf".equals(documentData.getMimetype())
                 && documentData.getFile() == file
         ));
-        verify(customerService).addDocumentToCustomer("alice", "invoice.pdf", 0);
+        verify(customerService).addDocumentToCustomer("alice", file, "invoice.pdf");
     }
 
     @Test
     void getDocumentDataLoadsDataUsingStoredLink() {
         DocumentLinkEntry linkEntry = new DocumentLinkEntry();
         linkEntry.setOwnerId("alice");
-        linkEntry.setDocumentId("invoice.pdf");
+        linkEntry.setDocumentId(42L);
 
         DocumentData expected = new DocumentData(
             new byte[]{1, 2, 3},
@@ -61,7 +67,7 @@ class OrcherstratorServiceTest {
         );
 
         when(documentLinkService.getDocumentLink("token-1")).thenReturn(linkEntry);
-        when(documentDataService.downloadFile("alice", "invoice.pdf")).thenReturn(expected);
+        when(documentDataService.downloadFile("alice", 42L)).thenReturn(expected);
 
         DocumentData result = service.getDocumentData("token-1");
 

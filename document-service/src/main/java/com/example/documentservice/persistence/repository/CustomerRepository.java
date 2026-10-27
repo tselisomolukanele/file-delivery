@@ -8,9 +8,9 @@ import java.util.Optional;
 import com.example.documentservice.persistence.model.Customer;
 
 @ApplicationScoped
+@Transactional
 public class CustomerRepository implements PanacheRepository<Customer> {
 
-    @Transactional
     public Customer save(Customer customer) {
         persist(customer);
         return customer;

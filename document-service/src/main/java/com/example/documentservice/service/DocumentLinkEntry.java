@@ -6,7 +6,7 @@ import lombok.Data;
 public class DocumentLinkEntry {
 
     private String id;
-    private String documentId;
+    private long documentId;
     private String ownerId;
     private String link;
 }

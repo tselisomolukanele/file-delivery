@@ -43,10 +43,10 @@ class DocumentLinkServiceTest {
 
     @Test
     void createDocumentLinkStoresEntryAndReturnsLink() {
-        DocumentLinkEntry result = service.createDocumentLink("invoice.pdf", "alice");
+        DocumentLinkEntry result = service.createDocumentLink(42L, "alice");
 
         assertNotNull(result.getId());
-        assertEquals("invoice.pdf", result.getDocumentId());
+        assertEquals(42L, result.getDocumentId());
         assertEquals("alice", result.getOwnerId());
         assertTrue(result.getLink().startsWith("https://example.com/api/document/download/"));
         verify(valueCommands).set(anyString(), any(DocumentLinkEntry.class), any(SetArgs.class));
@@ -56,7 +56,7 @@ class DocumentLinkServiceTest {
     void getDocumentLinkReturnsStoredEntry() {
         DocumentLinkEntry expected = new DocumentLinkEntry();
         expected.setId("abc-123");
-        expected.setDocumentId("invoice.pdf");
+        expected.setDocumentId(42L);
         expected.setOwnerId("alice");
         expected.setLink("https://example.com/document/download/abc-123");
 

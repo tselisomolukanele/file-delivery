@@ -11,6 +11,9 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 
+import com.example.documentservice.persistence.model.Document;
+import com.example.documentservice.persistence.repository.DocumentRepository;
+
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,15 +29,21 @@ class DocumentDataServiceTest {
 
     private DocumentDataService service;
     private S3Client s3Client;
+    private DocumentRepository documentRepository;
 
     @BeforeEach
     void setUp() throws Exception {
         service = new DocumentDataService();
         s3Client = mock(S3Client.class);
+        documentRepository = mock(DocumentRepository.class);
 
         Field s3Field = DocumentDataService.class.getDeclaredField("s3");
         s3Field.setAccessible(true);
         s3Field.set(service, s3Client);
+
+        Field repoField = DocumentDataService.class.getDeclaredField("documentRepository");
+        repoField.setAccessible(true);
+        repoField.set(service, documentRepository);
 
         Field bucketField = DocumentDataService.class.getDeclaredField("bucketName");
         bucketField.setAccessible(true);
@@ -49,9 +58,13 @@ class DocumentDataServiceTest {
             payload
         );
 
+        Document document = new Document();
+        document.setFilename("notes.txt");
+        document.setChecksum("abc123");
+        when(documentRepository.findById(99L)).thenReturn(document);
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(objectBytes);
 
-        DocumentData result = service.downloadFile(null, "notes.txt");
+        DocumentData result = service.downloadFile("alice", 99L);
 
         assertEquals("notes.txt", result.getFilename());
         assertEquals("text/plain", result.getMimetype());
@@ -65,9 +78,13 @@ class DocumentDataServiceTest {
             new byte[0]
         );
 
+        Document document = new Document();
+        document.setFilename("empty.txt");
+        document.setChecksum("empty123");
+        when(documentRepository.findById(100L)).thenReturn(document);
         when(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).thenReturn(objectBytes);
 
-        assertThrows(NotFoundException.class, () -> service.downloadFile(null, "empty.txt"));
+        assertThrows(NotFoundException.class, () -> service.downloadFile("alice", 100L));
     }
 
     @Test

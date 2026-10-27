@@ -2,6 +2,8 @@ package com.example.documentservice.service;
 
 import java.io.File;
 
+import com.example.documentservice.persistence.model.Document;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -22,10 +24,10 @@ public class OrcherstratorService {
 
     public void createAndUploadDocument(String customerName, File data, String filename, String mimetype) {
         log.info("Creating and uploading document for customer: {}", customerName);
-        customerService.addDocumentToCustomer(customerName, filename, data.length());
+        Document addedDocument = customerService.addDocumentToCustomer(customerName, data, filename);
 
         // Handle logic that cannot be rollbacked last
-        documentDataService.uploadFile(new DocumentData(null, data, customerName + "_" + filename, mimetype));
+        documentDataService.uploadFile(new DocumentData(null, data, customerName + "_" + addedDocument.getChecksum(), mimetype));
     }
 
     public DocumentData getDocumentData(String objectKey) {

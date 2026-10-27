@@ -1,14 +1,23 @@
 package com.example.documentservice.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.example.documentservice.persistence.model.Customer;
 import com.example.documentservice.persistence.model.Document;
 import com.example.documentservice.persistence.repository.CustomerRepository;
+import com.example.documentservice.persistence.repository.DocumentRepository;
 import com.example.documentservice.presentation.CustomerDTO;
 import com.example.documentservice.presentation.DocumentDTO;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.ByteSource;
 
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -31,6 +40,9 @@ public class CustomerService {
     
     @Inject
     CustomerRepository customerRepository;
+
+    @Inject
+    DocumentRepository documentRepository;
 
     public List<CustomerDTO> getAllCustomers() {
 
@@ -62,7 +74,7 @@ public class CustomerService {
                     .size(documentEntity.getFileSize())
                     .uploadedAt(documentEntity.getUploadedAt())
                     .link(
-                        documentLinkService.createDocumentLink(documentEntity.getFilename(), 
+                        documentLinkService.createDocumentLink(documentEntity.getId(), 
                         securityIdentity.getPrincipal().getName()).getLink()
                     )
                     .build()
@@ -70,17 +82,34 @@ public class CustomerService {
             .collect(Collectors.toList());
     }
 
-    public void addDocumentToCustomer(String customerName, String filename, long filesize) {
+    public Document addDocumentToCustomer(String customerName, File file, String filename) {
 
-        var newDocument = new Document();
-        newDocument.setFilename(filename);
-        newDocument.setFileSize(filesize);
-        newDocument.setUploadedAt(LocalDateTime.now());
-        newDocument.setUploadedBy(securityIdentity.getPrincipal().getName());
+        try {
+            ByteSource byteSource = com.google.common.io.Files.asByteSource(file);
+            HashCode hc = byteSource.hash(Hashing.sha256());
+            String checksum = hc.toString();
 
-        customerRepository.findByName(customerName)
-            .orElseThrow(() -> new NotFoundException("Customer not found"))
-            .addDocument(newDocument);
+            var newDocument = new Document();
+            newDocument.setFilename(filename);
+            newDocument.setFileSize(Files.size(Paths.get(file.getPath())));
+            newDocument.setUploadedAt(LocalDateTime.now());
+            newDocument.setUploadedBy(securityIdentity.getPrincipal().getName());
+            newDocument.setChecksum(checksum);
+
+            Optional<Document> found =
+                documentRepository.findByChecksumAndCustomerName(checksum, customerName);
+            if (found.isPresent()) {
+                throw new BadRequestException("Document already exist for the customer");
+            }
+
+            customerRepository.findByName(customerName)
+                .orElseThrow(() -> new NotFoundException("Customer not found"))
+                .addDocument(newDocument);
+
+            return newDocument;
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     public CustomerDTO addCustomer(CustomerDTO customerDTO) {

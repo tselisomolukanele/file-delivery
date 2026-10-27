@@ -2,6 +2,9 @@ package com.example.documentservice.service;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import com.example.documentservice.persistence.model.Document;
+import com.example.documentservice.persistence.repository.DocumentRepository;
+
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -25,8 +28,14 @@ public class DocumentDataService {
     @ConfigProperty(name = "bucket.name")
     String bucketName;
 
-    public DocumentData downloadFile(String owner, String fileName) {
-        var getObjectRequest = buildGetRequest(owner + "_" + fileName);
+    @Inject
+    DocumentRepository documentRepository;
+
+    public DocumentData downloadFile(String owner, long documentId) {
+
+        Document found = documentRepository.findById(documentId);
+
+        var getObjectRequest = buildGetRequest(owner + "_" + found.getChecksum());
         ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(getObjectRequest);
 
         byte[] data = objectBytes.asByteArray();
@@ -35,7 +44,7 @@ public class DocumentDataService {
             throw new NotFoundException("The file is empty on S3.");
         }
 
-        return new DocumentData(data, null, fileName, objectBytes.response().contentType());
+        return new DocumentData(data, null, found.getFilename(), objectBytes.response().contentType());
     }
 
     public void uploadFile(DocumentData documentData) {

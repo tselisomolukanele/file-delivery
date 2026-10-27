@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.security.Principal;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.stream.Stream;
 import com.example.documentservice.persistence.model.Customer;
 import com.example.documentservice.persistence.model.Document;
 import com.example.documentservice.persistence.repository.CustomerRepository;
+import com.example.documentservice.persistence.repository.DocumentRepository;
 import com.example.documentservice.presentation.CustomerDTO;
 import com.example.documentservice.presentation.DocumentDTO;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -27,6 +29,7 @@ class CustomerServiceTest {
 
     private CustomerService service;
     private CustomerRepository customerRepository;
+    private DocumentRepository documentRepository;
     private DocumentLinkService documentLinkService;
     private SecurityIdentity securityIdentity;
 
@@ -34,10 +37,12 @@ class CustomerServiceTest {
     void setUp() throws Exception {
         service = new CustomerService();
         customerRepository = mock(CustomerRepository.class);
+        documentRepository = mock(DocumentRepository.class);
         documentLinkService = mock(DocumentLinkService.class);
         securityIdentity = mock(SecurityIdentity.class);
 
         setField("customerRepository", customerRepository);
+        setField("documentRepository", documentRepository);
         setField("documentLinkService", documentLinkService);
         setField("securityIdentity", securityIdentity);
 
@@ -60,14 +65,15 @@ class CustomerServiceTest {
     }
 
     @Test
-    void getCustomerDocumentsReturnsDocumentListWithLinks() {
+    void getCustomerDocumentsReturnsDocumentListWithLinks() throws Exception {
         Customer customer = new Customer();
         Document document = new Document();
+        setDocumentId(document, 42L);
         document.setFilename("invoice.pdf");
         customer.addDocument(document);
 
         when(customerRepository.findByName("alice")).thenReturn(Optional.of(customer));
-        when(documentLinkService.createDocumentLink("invoice.pdf", "alice"))
+        when(documentLinkService.createDocumentLink(42L, "alice"))
             .thenReturn(newDocumentLink("https://example.com/download/abc-123"));
 
         List<DocumentDTO> results = service.getCustomerDocuments();
@@ -89,22 +95,32 @@ class CustomerServiceTest {
     }
 
     @Test
-    void addDocumentToCustomerAddsDocumentToExistingCustomer() {
+    void addDocumentToCustomerAddsDocumentToExistingCustomer() throws Exception {
         Customer customer = new Customer();
         customer.setName("alice");
         when(customerRepository.findByName("alice")).thenReturn(Optional.of(customer));
+        when(documentRepository.findByChecksumAndCustomerName(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.eq("alice")))
+            .thenReturn(Optional.empty());
 
-        service.addDocumentToCustomer("alice", "invoice.pdf", 500);
+        File file = File.createTempFile("invoice", ".pdf");
+        file.deleteOnExit();
+
+        service.addDocumentToCustomer("alice", file, "invoice.pdf");
 
         assertEquals(1, customer.getDocuments().size());
         assertEquals("invoice.pdf", customer.getDocuments().get(0).getFilename());
     }
 
     @Test
-    void addDocumentToCustomerThrowsWhenCustomerIsMissing() {
+    void addDocumentToCustomerThrowsWhenCustomerIsMissing() throws Exception {
         when(customerRepository.findByName("missing")).thenReturn(Optional.empty());
+        when(documentRepository.findByChecksumAndCustomerName(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.eq("missing")))
+            .thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> service.addDocumentToCustomer("missing", "invoice.pdf", 500));
+        File file = File.createTempFile("missing", ".pdf");
+        file.deleteOnExit();
+
+        assertThrows(NotFoundException.class, () -> service.addDocumentToCustomer("missing", file, "missing.pdf"));
     }
 
     private void setField(String fieldName, Object value) throws Exception {
@@ -113,10 +129,16 @@ class CustomerServiceTest {
         field.set(service, value);
     }
 
+    private void setDocumentId(Document document, Long id) throws Exception {
+        Field field = Document.class.getDeclaredField("id");
+        field.setAccessible(true);
+        field.set(document, id);
+    }
+
     private DocumentLinkEntry newDocumentLink(String link) {
         DocumentLinkEntry entry = new DocumentLinkEntry();
         entry.setId("abc-123");
-        entry.setDocumentId("invoice.pdf");
+        entry.setDocumentId(42L);
         entry.setOwnerId("alice");
         entry.setLink(link);
         return entry;

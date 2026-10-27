@@ -33,7 +33,7 @@ public class DocumentLinkService {
         valueCommands = ds.value(DocumentLinkEntry.class);
     }
 
-    public DocumentLinkEntry createDocumentLink(String documentId, String ownerId) {
+    public DocumentLinkEntry createDocumentLink(long documentId, String ownerId) {
 
         String uuid = UUID.randomUUID().toString();
 
