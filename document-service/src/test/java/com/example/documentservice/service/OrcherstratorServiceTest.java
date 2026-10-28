@@ -55,9 +55,12 @@ class OrcherstratorServiceTest {
 
     @Test
     void getDocumentDataLoadsDataUsingStoredLink() {
-        DocumentLinkEntry linkEntry = new DocumentLinkEntry();
-        linkEntry.setOwnerId("alice");
-        linkEntry.setDocumentId(42L);
+        DocumentLinkEntry linkEntry =
+            DocumentLinkEntry
+            .builder()
+            .ownerId("alice")
+            .documentId(42L)
+            .build();
 
         DocumentData expected =
             DocumentData

@@ -37,11 +37,14 @@ public class DocumentLinkService {
 
         String uuid = UUID.randomUUID().toString();
 
-        DocumentLinkEntry entry = new DocumentLinkEntry();
-        entry.setId(uuid);
-        entry.setDocumentId(documentId);
-        entry.setOwnerId(ownerId);
-        entry.setLink(baseUrl + "/api/document/download/" + uuid);
+        DocumentLinkEntry entry =
+            DocumentLinkEntry
+            .builder()
+            .id(uuid)
+            .documentId(documentId)
+            .ownerId(ownerId)
+            .link(baseUrl + "/api/document/download/" + uuid)
+            .build();
 
         valueCommands.set(uuid, entry, new SetArgs().ex(tokenTtl));
 

@@ -54,12 +54,15 @@ class DocumentLinkServiceTest {
 
     @Test
     void getDocumentLinkReturnsStoredEntry() {
-        DocumentLinkEntry expected = new DocumentLinkEntry();
-        expected.setId("abc-123");
-        expected.setDocumentId(42L);
-        expected.setOwnerId("alice");
-        expected.setLink("https://example.com/document/download/abc-123");
-
+        DocumentLinkEntry expected =
+            DocumentLinkEntry
+            .builder()
+            .id("abc-123")
+            .documentId(42L)
+            .ownerId("alice")
+            .link("https://example.com/document/download/abc-123")
+            .build();
+        
         when(valueCommands.get("abc-123")).thenReturn(expected);
 
         DocumentLinkEntry result = service.getDocumentLink("abc-123");
