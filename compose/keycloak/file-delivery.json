@@ -44,7 +44,7 @@
   "waitIncrementSeconds" : 60,
   "quickLoginCheckMilliSeconds" : 1000,
   "maxDeltaTimeSeconds" : 43200,
-  "failureFactor" : 30,
+  "failureFactor" : 3,
   "maxSecondaryAuthFailures" : 0,
   "roles" : {
     "realm" : [ {
@@ -621,8 +621,8 @@
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "http://localhost:4200/*", "*" ],
-    "webOrigins" : [ "*" ],
+    "redirectUris" : [ "https://localhost:8443/*"],
+    "webOrigins" : [ "https://localhost:8443" ],
     "notBefore" : 0,
     "bearerOnly" : false,
     "consentRequired" : false,
@@ -641,7 +641,7 @@
       "standard.token.exchange.enabled" : "false",
       "oauth2.jwt.authorization.grant.enabled" : "false",
       "frontchannel.logout.session.required" : "true",
-      "post.logout.redirect.uris" : "*",
+      "post.logout.redirect.uris" : "https://localhost:8443/*",
       "oauth2.device.authorization.grant.enabled" : "false",
       "display.on.consent.screen" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false",
