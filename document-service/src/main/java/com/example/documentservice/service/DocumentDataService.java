@@ -51,6 +51,7 @@ public class DocumentDataService {
 
         return DocumentData
                 .builder()
+                .documentId(found.getId())
                 .data(data)
                 .filename(found.getFilename())
                 .mimetype(objectBytes.response().contentType())

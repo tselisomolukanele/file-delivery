@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
+import com.example.documentservice.persistence.model.DocumentAuditAction;
+import com.example.documentservice.persistence.model.DocumentAuditAuthType;
 import com.example.documentservice.service.CustomerService;
+import com.example.documentservice.service.DocumentAuditService;
 import com.example.documentservice.service.DocumentDataService;
 
 import io.quarkus.security.identity.SecurityIdentity;
@@ -33,6 +36,9 @@ public class CustomerResource {
     
     @Inject
     private SecurityIdentity securityIdentity;
+
+    @Inject
+    DocumentAuditService documentAuditService;
 
     @POST
     @Path("/")
@@ -79,6 +85,14 @@ public class CustomerResource {
         ResponseBuilder response = Response.ok(documentData.getData());
         response.header("Content-Disposition", "attachment;filename=" + documentData.getFilename());
         response.header("Content-Type", documentData.getMimetype());
+
+        documentAuditService.recordDocumentAccess(
+            documentData.getDocumentId(),
+            documentData.getOwner(),
+            DocumentAuditAction.DOWNLOAD,
+            DocumentAuditAuthType.SECURE
+        );
+
         return response.build();
     }
 

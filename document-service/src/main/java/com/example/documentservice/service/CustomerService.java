@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import com.example.documentservice.persistence.model.Customer;
 import com.example.documentservice.persistence.model.Document;
+import com.example.documentservice.persistence.model.DocumentAuditAction;
+import com.example.documentservice.persistence.model.DocumentAuditAuthType;
 import com.example.documentservice.persistence.repository.CustomerRepository;
 import com.example.documentservice.persistence.repository.DocumentRepository;
 import com.example.documentservice.presentation.CustomerDTO;
@@ -46,6 +48,9 @@ public class CustomerService {
 
     @Inject
     DocumentRepository documentRepository;
+
+    @Inject
+    DocumentAuditService documentAuditService;
 
     @Inject 
     RedisDataSource ds;
@@ -115,7 +120,19 @@ public class CustomerService {
                 .orElseThrow(() -> new NotFoundException("Customer not found"))
                 .addDocument(newDocument);
 
-            return newDocument;
+            Document added =
+                documentRepository.findByChecksumAndCustomerName(checksum, customerName)
+                .orElseThrow();
+
+            var loggedinUser = securityIdentity.getPrincipal().getName();
+            documentAuditService.recordDocumentAccess(
+                newDocument.getId(),
+                loggedinUser,
+                DocumentAuditAction.UPLOAD,
+                DocumentAuditAuthType.SECURE
+            );
+
+            return added;
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }

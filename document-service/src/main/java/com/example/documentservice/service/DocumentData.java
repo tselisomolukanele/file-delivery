@@ -8,6 +8,7 @@ import lombok.Data;
 @Data 
 @Builder 
 public class DocumentData {
+    private Long documentId;
     private byte[] data;
     private File file;
     private String filename;

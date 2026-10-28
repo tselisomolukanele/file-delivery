@@ -19,7 +19,10 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.apache.tika.Tika;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import com.example.documentservice.persistence.model.DocumentAuditAction;
+import com.example.documentservice.persistence.model.DocumentAuditAuthType;
 import com.example.documentservice.service.CustomerService;
+import com.example.documentservice.service.DocumentAuditService;
 import com.example.documentservice.service.OrcherstratorService;
 
 @Path("/api/document")
@@ -31,6 +34,9 @@ public class DocumentResource {
 
     @Inject 
     CustomerService customerService;
+
+    @Inject
+    DocumentAuditService documentAuditService;
 
     @ConfigProperty(name = "document.link.base.url")
     String baseUrl;
@@ -72,6 +78,13 @@ public class DocumentResource {
                 )
                 .build();
         }
+
+        documentAuditService.recordDocumentAccess(
+            documentData.getDocumentId(),
+            documentData.getOwner(),
+            DocumentAuditAction.DOWNLOAD,
+            DocumentAuditAuthType.LINK_OTP
+        );
 
         ResponseBuilder response = Response.ok(documentData.getData());
         response.header("Content-Disposition", "attachment;filename=" + documentData.getFilename());
