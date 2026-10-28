@@ -126,7 +126,9 @@ services:
       QUARKUS_OIDC_TOKEN_ISSUER: "https://localhost:8082/realms/file-delivery"
       QUARKUS_OIDC_DISCOVERY_ENABLED: "false"
       QUARKUS_OIDC_JWKS_PATH: "/protocol/openid-connect/certs"
-      QUARKUS_OIDC_TLS_VERIFICATION: "none"
+      QUARKUS_OIDC_TLS_VERIFICATION: "required"
+      QUARKUS_OIDC_TLS_TRUST_STORE_FILE: /deployments/certs/keycloak.p12
+      QUARKUS_OIDC_TLS_TRUST_STORE_PASSWORD: ${APP_TRUSTSTORE_PASSWORD}
       QUARKUS_HTTP_AUTH_PROACTIVE: "false"
       QUARKUS_S3_ENDPOINT_OVERRIDE: http://s3:80
       QUARKUS_S3_AWS_REGION: us-east-1
@@ -134,6 +136,9 @@ services:
       QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_ACCESS_KEY_ID: ${S3_KEY}
       QUARKUS_S3_AWS_CREDENTIALS_STATIC_PROVIDER_SECRET_ACCESS_KEY: ${S3_SECRET}
       QUARKUS_S3_PATH_STYLE_ACCESS: true
+    configs:
+      - target: /deployments/certs/keycloak.p12
+        source: config_for_api_truststore
   file-delivery-ui:
     build:
       context: ../UI
@@ -211,3 +216,5 @@ configs:
     file: ./secrets/ui.key
   config_for_ui_ssl_crt:
     file: ./secrets/ui.crt
+  config_for_api_truststore:
+    file: ./secrets/keycloak.p12
