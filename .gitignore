@@ -1,1 +1,44 @@
-document-service/target
+# Java / Maven / Quarkus
+**/target/
+**/build/
+**/.gradle/
+**/out/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# Node / Angular
+**/node_modules/
+**/dist/
+**/coverage/
+**/.angular/
+**/.sass-cache/
+**/.cache/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*~
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+compose/secrets/*
+compose/ssl/*.key
+compose/ssl/*.crt
+compose/ssl/*.pem
+compose/ssl/*.p12
+compose/ssl/*.jks
+
+# OS files
+.DS_Store
+Thumbs.db
