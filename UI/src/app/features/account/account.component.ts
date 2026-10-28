@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AuthService } from '../../auth/auth.service';
 import { DocumentItem } from '../../services/document.service';
-import { CustomerService } from '../../services/cutomer.service';
+import { CustomerService } from '../../services/customer.service';
 
 @Component({
   selector: 'app-account',

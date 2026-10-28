@@ -15,16 +15,16 @@ import com.example.documentservice.persistence.model.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class OrcherstratorServiceTest {
+class OrchestratorServiceTest {
 
-    private OrcherstratorService service;
+    private OrchestratorService service;
     private DocumentLinkService documentLinkService;
     private DocumentDataService documentDataService;
     private CustomerService customerService;
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new OrcherstratorService();
+        service = new OrchestratorService();
         documentLinkService = mock(DocumentLinkService.class);
         documentDataService = mock(DocumentDataService.class);
         customerService = mock(CustomerService.class);
@@ -80,7 +80,7 @@ class OrcherstratorServiceTest {
     }
 
     private void setField(String fieldName, Object value) throws Exception {
-        Field field = OrcherstratorService.class.getDeclaredField(fieldName);
+        Field field = OrchestratorService.class.getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(service, value);
     }

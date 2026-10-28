@@ -3,7 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { AuthService } from '../../auth/auth.service';
 import { DocumentProfile, DocumentService } from '../../services/document.service';
-import { CustomerService } from '../../services/cutomer.service';
+import { CustomerService } from '../../services/customer.service';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({

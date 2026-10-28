@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @ApplicationScoped 
 @Transactional
 @Slf4j 
-public class OrcherstratorService {
+public class OrchestratorService {
     @Inject 
     DocumentLinkService documentLinkService;
 

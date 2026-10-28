@@ -26,14 +26,14 @@ import com.example.documentservice.persistence.model.DocumentAuditAction;
 import com.example.documentservice.persistence.model.DocumentAuditAuthType;
 import com.example.documentservice.service.CustomerService;
 import com.example.documentservice.service.DocumentAuditService;
-import com.example.documentservice.service.OrcherstratorService;
+import com.example.documentservice.service.OrchestratorService;
 
 @Path("/api/document")
 @Slf4j
 public class DocumentResource {
 
     @Inject 
-    OrcherstratorService orchestrator;
+    OrchestratorService orchestrator;
 
     @Inject 
     CustomerService customerService;

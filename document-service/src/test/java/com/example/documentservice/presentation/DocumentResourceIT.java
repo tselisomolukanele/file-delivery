@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import com.example.documentservice.service.CustomerService;
 import com.example.documentservice.service.DocumentAuditService;
 import com.example.documentservice.service.DocumentData;
-import com.example.documentservice.service.OrcherstratorService;
+import com.example.documentservice.service.OrchestratorService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 class DocumentResourceIT {
 
     @InjectMock
-    OrcherstratorService orchestratorService;
+    OrchestratorService orchestratorService;
 
     @InjectMock
     CustomerService customerService;
