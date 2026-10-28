@@ -33,25 +33,27 @@ To build respective docker images run the following commands
     4. compose/secrets/ui.key
     5. compose/secrets/keycloak.p12          **This file is a truststore containing the certificate in file 1. compose/secrets/keycloak.crt**
 
-Afer building the 2 images you can run the solution with dependencies using the following command on the commands in the project root folder
+The solution can be started with dependencies using the following command on the commands in the project root folder
 - `source .env`
 - `cd compose`
-- `docker compose up`
+- `docker compose up --build`
 
 ### Usage
 ##### Preparation
 1. On Keycloak has the following pre set
     - realm named `file-delivery`
     - client named `file-delivery-ui`
-    - 2 realm roles `file-uploader` and `file-owner` with respective users admin:admin and client:client 
+    - 2 realm roles `file-uploader` and `file-owner` with respective users *admin:admin* and *client:client* 
     - At least a user for each of the roles above
 2. On S3 set up bucket named quarkus.s3.file-delivery-bucket
 
-After the preparation access the UI and login with the user having file-uploader rights.  With this user on the accounts page it is possible to add client and thier documents.  *Make sure the client name matched the login name in keycloak* 
+After the preparation access the UI and login with the user having file-uploader rights.  With this user on the accounts page it is possible to add client and thier documents.  *Make sure the client username (sub) matched the login name in keycloak* 
 
-After adding the respetive clients you can log out and log in using the users added above with their relavant Keycloak credentials.
+After adding the respective users you can log out and log in using the users added above with their relavant Keycloak credentials.
 
-On the account page the documents will be listed and can be downloaded or emailed (through a simple HTML simulator)
+On the account page the documents will be listed and can be downloaded or emailed (through a simple HTML eMail simulator).  The simulator will require an OTP which for simulation purposes can be retrieved from the accounts page.
+
+
 
 The documets link expire through a configured property `token.ttl` and is useable once only.  The property is configuratble in the application.properties file.
 
