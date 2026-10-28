@@ -2,6 +2,7 @@ package com.example.documentservice.presentation;
 
 import static io.restassured.RestAssured.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import com.example.documentservice.service.CustomerService;
+import com.example.documentservice.service.DocumentAuditService;
 import com.example.documentservice.service.DocumentData;
 import com.example.documentservice.service.OrcherstratorService;
 import io.quarkus.test.InjectMock;
@@ -25,6 +27,9 @@ class DocumentResourceIT {
 
     @InjectMock
     CustomerService customerService;
+
+    @InjectMock
+    DocumentAuditService documentAuditService;
 
     @Test
     @TestSecurity(user = "alice", roles = {"file-uploader"})
@@ -71,6 +76,7 @@ class DocumentResourceIT {
 
         when(orchestratorService.getDocumentData("token-123")).thenReturn(documentData);
         when(customerService.validateOTP("2345", "person")).thenReturn(true);
+        doNothing().when(documentAuditService).recordDocumentAccess(anyLong(), anyString(), any(), any());
 
         given()
             .when()
@@ -78,6 +84,30 @@ class DocumentResourceIT {
             .then()
             .statusCode(200)
             .header("Content-Type", "application/pdf")
-            .header("Content-Disposition", "attachment;filename=invoice.pdf");
+            .header("Content-Disposition", "attachment; filename=\"invoice.pdf\"; filename*=UTF-8''invoice.pdf");
+    }
+
+    @Test
+    void downloadDocumentEncodesFilenameForUtf8() {
+        DocumentData documentData = 
+            DocumentData
+            .builder()
+            .data("hello".getBytes())
+            .filename("invoice résumé.pdf")
+            .mimetype("application/pdf")
+            .owner("person")
+            .build();
+
+        when(orchestratorService.getDocumentData("token-utf8")).thenReturn(documentData);
+        when(customerService.validateOTP("2345", "person")).thenReturn(true);
+        doNothing().when(documentAuditService).recordDocumentAccess(anyLong(), anyString(), any(), any());
+
+        given()
+            .when()
+            .get("/api/document/download/token-utf8?otp=2345")
+            .then()
+            .statusCode(200)
+            .header("Content-Type", "application/pdf")
+            .header("Content-Disposition", "attachment; filename=\"invoice résumé.pdf\"; filename*=UTF-8''invoice%20r%C3%A9sum%C3%A9.pdf");
     }
 }

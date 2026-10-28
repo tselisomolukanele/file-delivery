@@ -1,5 +1,7 @@
 package com.example.documentservice.presentation;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
@@ -83,7 +85,7 @@ public class CustomerResource {
         var documentData = documentDataService.downloadFile(customerName, documentId);
 
         ResponseBuilder response = Response.ok(documentData.getData());
-        response.header("Content-Disposition", "attachment;filename=" + documentData.getFilename());
+        response.header("Content-Disposition", buildContentDisposition(documentData.getFilename()));
         response.header("Content-Type", documentData.getMimetype());
 
         documentAuditService.recordDocumentAccess(
@@ -94,6 +96,13 @@ public class CustomerResource {
         );
 
         return response.build();
+    }
+
+    private static String buildContentDisposition(String filename) {
+        String safeFilename = filename == null || filename.isBlank() ? "download" : filename;
+        String encodedFilename = URLEncoder.encode(safeFilename, StandardCharsets.UTF_8)
+            .replace("+", "%20");
+        return "attachment; filename=\"" + safeFilename.replace("\"", "\\\"") + "\"; filename*=UTF-8''" + encodedFilename;
     }
 
     @ServerExceptionMapper

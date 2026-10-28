@@ -1,5 +1,8 @@
 package com.example.documentservice.presentation;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -87,9 +90,16 @@ public class DocumentResource {
         );
 
         ResponseBuilder response = Response.ok(documentData.getData());
-        response.header("Content-Disposition", "attachment;filename=" + documentData.getFilename());
+        response.header("Content-Disposition", buildContentDisposition(documentData.getFilename()));
         response.header("Content-Type", documentData.getMimetype());
         return response.build();
+    }
+
+    private static String buildContentDisposition(String filename) {
+        String safeFilename = filename == null || filename.isBlank() ? "download" : filename;
+        String encodedFilename = URLEncoder.encode(safeFilename, StandardCharsets.UTF_8)
+            .replace("+", "%20");
+        return "attachment; filename=\"" + safeFilename.replace("\"", "\\\"") + "\"; filename*=UTF-8''" + encodedFilename;
     }
 
     @POST
