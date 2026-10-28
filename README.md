@@ -1,61 +1,60 @@
 # file-delivery
-A system to store customer account statements as PDF files and provide secure, time-limited download links to customers.
+A system for storing customer account statements as PDF files and providing secure, time-limited download links to customers.
 
-The system is a collection of microservices conternerized with Docker and ochestrated usind Docker compose.
+The system is a collection of microservices containerized with Docker and orchestrated using Docker Compose.
 
-## Requiments
-### Compiling and building 
+## Requirements
+### Compiling and building
 #### Backend
 - Java 21
 - Apache Maven 3.9.9
-#### Frontend
-- NodeJs 24
-- NPM 11
 
-To build respective docker images run the following commands
+#### Frontend
+- Node.js 24
+- npm 11
+
+To build the Docker images, run the following commands:
 - Backend
-    - `cd document-service`
-    - `./mvnw clean package`
-    - `docker build -t filedelivery-api .` resulting Docker image *<configured-docker-username>document-service:1.0.0-SNAPSHOT*
+  - `cd document-service`
+  - `./mvnw clean package`
+  - `docker build -t filedelivery-api .` resulting Docker image *<configured-docker-username>document-service:1.0.0-SNAPSHOT*
 - Frontend
-    - `cd UI`
-    - `npm ci --legacy-peer-deps`
-    - `npm run build`
-    - `docker build -t file-delivery-ui .` resulting Docker image *file-delivery-ui:latest*
+  - `cd UI`
+  - `npm ci --legacy-peer-deps`
+  - `npm run build`
+  - `docker build -t file-delivery-ui .` resulting Docker image *file-delivery-ui:latest*
 
 ### Running with Docker Compose
-#### Prepare the docker runtime by specifying the following
-1. .env file.  There is an env.example with the various secrets to used by Docker compose
-2. The relevant certificates for the UI and Keycloak must be put in the respective locations.  Alternatively you can edit the compose.yml and edit the rererences to point to the correct file paths
-    1. compose/secrets/keycloak.crt
-    2. compose/secrets/keycloak.key
-    3. compose/secrets/ui.crt
-    4. compose/secrets/ui.key
-    5. compose/secrets/keycloak.p12          **This file is a truststore containing the certificate in file 1. compose/secrets/keycloak.crt**
+#### Prepare the Docker runtime by specifying the following
+1. An `.env` file. There is an `env.example` file with the various secrets used by Docker Compose.
+2. The relevant certificates for the UI and Keycloak must be placed in their respective locations. Alternatively, edit `compose.yml` to point to the correct file paths.
+    1. `compose/secrets/keycloak.crt`
+    2. `compose/secrets/keycloak.key`
+    3. `compose/secrets/ui.crt`
+    4. `compose/secrets/ui.key`
+    5. `compose/secrets/keycloak.p12` — this is a truststore containing the certificate in file 1, `compose/secrets/keycloak.crt`
 
-The solution can be started with dependencies using the following command on the commands in the project root folder
+The solution can be started with its dependencies using the following commands from the project root:
 - `source .env`
 - `cd compose`
 - `docker compose up --build`
 
 ### Usage
-##### Preparation
-1. On Keycloak has the following pre set
+#### Preparation
+1. On Keycloak, configure the following:
     - realm named `file-delivery`
     - client named `file-delivery-ui`
-    - 2 realm roles `file-uploader` and `file-owner` with respective users *admin:admin* and *client:client* 
-    - At least a user for each of the roles above
-2. On S3 set up bucket named quarkus.s3.file-delivery-bucket
+    - 2 realm roles: `file-uploader` and `file-owner`, with the respective users `admin:admin` and `client:client`
+    - at least one user for each of the roles above
+2. On S3, set up a bucket named `quarkus.s3.file-delivery-bucket`
 
-After the preparation access the UI and login with the user having file-uploader rights.  With this user on the accounts page it is possible to add client and thier documents.  *Make sure the client username (sub) matched the login name in keycloak* 
+After preparation, access the UI and log in with the user who has `file-uploader` rights. On the Accounts page, this user can add clients and their documents. Ensure the client username matches the login name in Keycloak.
 
-After adding the respective users you can log out and log in using the users added above with their relavant Keycloak credentials.
+After adding the users, you can log out and log in again using the newly created users and their relevant Keycloak credentials.
 
-On the account page the documents will be listed and can be downloaded or emailed (through a simple HTML eMail simulator).  The simulator will require an OTP which for simulation purposes can be retrieved from the accounts page.
+On the Account page, documents will be listed and can be downloaded or emailed through a simple HTML email simulator. The simulator requires an OTP, which can be retrieved from the Accounts page for simulation purposes.
 
-
-
-The documets link expire through a configured property `token.ttl` and is useable once only.  The property is configuratble in the application.properties file.
+The document links expire according to the configured property `token.ttl` and can be used only once. This property is configurable in the `application.properties` file.
 
 ## Project development documentation
-An architecture diagram has been added for reference ![Architechture Design](design.svg)
+An architecture diagram has been added for reference: ![Architecture Design](design.svg)
