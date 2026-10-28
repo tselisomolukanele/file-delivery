@@ -31,6 +31,8 @@ To build respective docker images run the following commands
     2. compose/secrets/keycloak.key
     3. compose/secrets/ui.crt
     4. compose/secrets/ui.key
+    5. compose/secrets/keycloak.p12          **This file is a truststore containing the certificate in file 1. compose/secrets/keycloak.crt**
+
 Afer building the 2 images you can run the solution with dependencies using the following command on the commands in the project root folder
 - `source .env`
 - `cd compose`
