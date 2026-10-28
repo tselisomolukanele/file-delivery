@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import com.example.documentservice.persistence.model.Customer;
 import com.example.documentservice.persistence.model.Document;
@@ -23,6 +26,7 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.ByteSource;
 
 import io.quarkus.redis.datasource.RedisDataSource;
+import io.quarkus.redis.datasource.value.SetArgs;
 import io.quarkus.redis.datasource.value.ValueCommands;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -55,10 +59,15 @@ public class CustomerService {
     @Inject 
     RedisDataSource ds;
 
+    @ConfigProperty(name = "otp.ttl")
+    int otpTtl;
+
     private final ValueCommands<String,OTPLinkEntry> valueCommands;
+    private final ValueCommands<String, Long> countCommands;
 
     public CustomerService(RedisDataSource ds) { 
         valueCommands = ds.value(OTPLinkEntry.class);
+        countCommands = ds.value(Long.class);
     }
 
     public List<CustomerDTO> getAllCustomers() {
@@ -134,7 +143,8 @@ public class CustomerService {
 
             return added;
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            log.error("Document failed to upload", exception);
+            throw new BadRequestException("Document failed to upload");
         }
     }
 
@@ -157,41 +167,52 @@ public class CustomerService {
     }
 
     public String getOTP() {
-        var username = securityIdentity.getPrincipal().getName();
-        Random random = new Random();
-        var otp = String.format("%04d", random.nextInt(10000));
+        var key = securityIdentity.getPrincipal().getName();
+        String otpKey = "otp:" + key;
+        String countKey = "count:" + key;
+        Random random = new SecureRandom();
+        var otp = String.format("%06d", random.nextInt(1000000));
         
         valueCommands.set(
-            username, 
-            OTPLinkEntry.builder().otp(otp).ownerId(username).build()
+            otpKey, 
+            OTPLinkEntry.builder().otp(otp).build(),
+            new SetArgs().ex(otpTtl)
+        );
+
+        countCommands.set(
+            countKey, 
+            0l,
+            new SetArgs().ex(otpTtl)
         );
 
         return otp;
     }
 
-    public boolean validateOTP(String otp, String username) {
-        var entry = valueCommands.get(username);
+    public boolean validateOTP(String otp, String key) {
+        String otpKey = "otp:" + key;
+        String countKey = "count:" + key;
+        var entry = valueCommands.get(otpKey);
 
         if (entry == null) {
-            log.error(
-                "OTP has no entry: {}  {}", 
-                username,
-                otp);
+            log.error("OTP has no entry");
             return false;
         }
 
-        if (!entry.getOwnerId().equals(username) || !entry.getOtp().equals(otp)) {
+        countCommands.incrby(countKey, 1);
 
-            log.error(
-                "OTP has no match: {} != {}, {} != {}", 
-                entry.getOwnerId(), 
-                username, 
-                entry.getOtp(),
-                otp);
+        if (!entry.getOtp().equals(otp)) {
+
+            log.error("OTP has no match");
+            if (countCommands.get(countKey) > 3) {
+                log.warn("OTP validation attempt reached maximum, otp will be removed to prevent brute force attempts.");
+                valueCommands.getdel(otpKey);
+                countCommands.getdel(countKey);        
+            }
             return false;
         }
 
-        valueCommands.getdel(username);
+        valueCommands.getdel(otpKey);
+        countCommands.getdel(countKey);
         return true;
     }
 }

@@ -38,7 +38,9 @@ public class DocumentDataService {
 
     public DocumentData downloadFile(String owner, long documentId) {
 
-        Document found = documentRepository.findById(documentId);
+        Document found =
+            documentRepository.findByIdAndCustomerName(documentId, owner)
+            .orElseThrow(() -> new NotFoundException("No document found for the given inputs"));
 
         var getObjectRequest = buildGetRequest(owner + "_" + found.getChecksum());
         ResponseBytes<GetObjectResponse> objectBytes = s3.getObjectAsBytes(getObjectRequest);

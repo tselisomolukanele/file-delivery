@@ -16,10 +16,12 @@ import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -67,7 +69,7 @@ public class CustomerResource {
         return customerService.getCustomerDocuments();
     }
 
-    @GET    
+    @POST
     @Path("/current/otp")
     @Produces(MediaType.TEXT_PLAIN)
     @RolesAllowed({"file-owner"})
@@ -103,15 +105,5 @@ public class CustomerResource {
         String encodedFilename = URLEncoder.encode(safeFilename, StandardCharsets.UTF_8)
             .replace("+", "%20");
         return "attachment; filename=\"" + safeFilename.replace("\"", "\\\"") + "\"; filename*=UTF-8''" + encodedFilename;
-    }
-
-    @ServerExceptionMapper
-    public Response mapException(ClientErrorException exception) {
-        return
-            Response
-                .status(exception.getResponse().getStatus())
-                .entity(exception.getMessage())
-                .type(MediaType.TEXT_PLAIN)
-                .build();
     }
 }

@@ -26,6 +26,7 @@ import com.example.documentservice.persistence.model.DocumentAuditAction;
 import com.example.documentservice.persistence.model.DocumentAuditAuthType;
 import com.example.documentservice.service.CustomerService;
 import com.example.documentservice.service.DocumentAuditService;
+import com.example.documentservice.service.DocumentLinkService;
 import com.example.documentservice.service.OrchestratorService;
 
 @Path("/api/document")
@@ -40,6 +41,9 @@ public class DocumentResource {
 
     @Inject
     DocumentAuditService documentAuditService;
+
+    @Inject
+    DocumentLinkService documentLinkService;
 
     @ConfigProperty(name = "document.link.base.url")
     String baseUrl;
@@ -88,6 +92,8 @@ public class DocumentResource {
             DocumentAuditAction.DOWNLOAD,
             DocumentAuditAuthType.LINK_OTP
         );
+
+        documentLinkService.removeLink(objectKey);
 
         ResponseBuilder response = Response.ok(documentData.getData());
         response.header("Content-Disposition", buildContentDisposition(documentData.getFilename()));

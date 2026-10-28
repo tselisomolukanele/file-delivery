@@ -10,6 +10,11 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+/*
+ *
+ * This is purely for simulation purposes and does not make part of the core application logic
+ * The proper way is to send the link throuh an actual email or SMS in a secure and authenticated route
+ */
 @Path("api/email")
 public class EmailResource {
 

@@ -21,8 +21,8 @@ public class DocumentLinkService {
     @ConfigProperty(name = "document.link.base.url")
     String baseUrl;
 
-    @ConfigProperty(name = "token.ttl")
-    int tokenTtl;
+    @ConfigProperty(name = "link.ttl")
+    int linkTtl;
 
     @Inject 
     RedisDataSource ds;
@@ -46,7 +46,7 @@ public class DocumentLinkService {
             .link(baseUrl + "/api/document/download/" + uuid)
             .build();
 
-        valueCommands.set(uuid, entry, new SetArgs().ex(tokenTtl));
+        valueCommands.set(uuid, entry, new SetArgs().ex(linkTtl));
 
         return entry;
     }
@@ -56,9 +56,14 @@ public class DocumentLinkService {
         var documentLinkEntry = valueCommands.get(objectKey);
 
         if (documentLinkEntry == null) {
-            throw new NotFoundException("Document link not found for key: " + objectKey);
+            throw new NotFoundException("Document link has expired");
         }
 
         return documentLinkEntry;
+    }
+
+    public void removeLink(String objectKey) {
+        
+        valueCommands.getdel(objectKey);
     }
 }

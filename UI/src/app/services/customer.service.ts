@@ -38,9 +38,9 @@ export class CustomerService {
   }
 
   getOTP(): Observable<string> {
-    return this.http.get<string>(`${this.baseUrl}/api/customers/current/otp`, {
-      headers: this.buildHeaders(),
-    });
+    return this.http.post<string>(`${this.baseUrl}/api/customers/current/otp`,
+      null, 
+      { headers: this.buildHeaders() });
   }
 
   private buildHeaders(): HttpHeaders {

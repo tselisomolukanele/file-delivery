@@ -10,7 +10,7 @@ The system is composed of microservices containerized with Docker and orchestrat
 - Apache Maven 3.9.9
 
 #### Frontend
-- Node.js 24
+- Node.js 22
 - npm 11
 
 To build the Docker images, run the following commands:
@@ -54,7 +54,7 @@ After adding the users, you can log out and log in again using the newly created
 
 On the Account page, documents will be listed and can be downloaded or emailed through a simple HTML email simulator. The simulator requires an OTP, which can be retrieved from the Accounts page for simulation purposes.
 
-The document links expire according to the configured property `token.ttl` and can be used only once. This property is configurable in the `application.properties` file.
+The document links expire according to the configured property `link.ttl` and can be used only once. This property is configurable in the `application.properties` file.  The OTP also has a configurable expiry `otp.ttl` and can also only be used once.
 
 ## How to test
 
